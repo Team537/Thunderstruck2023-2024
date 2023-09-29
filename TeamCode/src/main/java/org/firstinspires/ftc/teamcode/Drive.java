@@ -11,7 +11,7 @@ import com.qualcomm.robotcore.hardware.IMU;
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 
-@TeleOp
+@TeleOp(name = "Drive")
 
 public class Drive extends LinearOpMode {
 
@@ -82,10 +82,6 @@ public class Drive extends LinearOpMode {
             xRot = x * Math.cos(-botHeading) - y * Math.sin(-botHeading);
             yRot = x * Math.sin(-botHeading) + y * Math.cos(-botHeading);
 
-            cosineMove = (yRot + xRot)/Math.sqrt(2);
-            sineMove = (yRot - xRot)/Math.sqrt(2);
-
-            //revolving the point (x,y) around the origin by the bot heading to get its linear speeds
             cosineMove = (yRot + xRot)/Math.sqrt(2);
             sineMove = (yRot - xRot)/Math.sqrt(2);
 
