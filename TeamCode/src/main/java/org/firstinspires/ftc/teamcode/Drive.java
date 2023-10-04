@@ -38,6 +38,10 @@ public class Drive extends LinearOpMode {
     double mag = 0;
     double startAngle = 0;
 
+    double testLF = 0;
+    double testMove = 0;
+    double testPivot = 0;
+
     @Override
     public void runOpMode() {
 
@@ -98,8 +102,8 @@ public class Drive extends LinearOpMode {
             } else {
 
                 //setting the rotation speeds to the right stick x variable multiplied by a chaning function which ensures that the motor speed can't exceed 0, resulting in smoother movement
-                cosinePivot = rx * ( (1 - mag) + (sineMove*sineMove)/(2*mag) );
-                sinePivot = rx * ( (1 - mag) + (cosineMove*cosineMove)/(2*mag) );
+                cosinePivot = rx * ((1 - mag) + (sineMove * sineMove) / (2 * mag));
+                sinePivot = rx * ((1 - mag) + (cosineMove * cosineMove) / (2 * mag));
 
             }
 
@@ -108,6 +112,25 @@ public class Drive extends LinearOpMode {
             rf_motor.setPower(sineMove - sinePivot);
             rb_motor.setPower(cosineMove - cosinePivot);
             lb_motor.setPower(sineMove + sinePivot);
+
+            double lf = cosineMove + cosinePivot;
+            double rf = sineMove - sinePivot;
+            double rb = cosineMove - cosinePivot;
+            double lb = sineMove + sinePivot;
+
+            telemetry.addData("Left Front", lf);
+            telemetry.addData("Right Front", rf);
+            telemetry.addData("Right Back", rb);
+            telemetry.addData("Left Back", lb);
+            if (Math.abs(lf) > testLF) {
+                testLF = Math.abs(lf);
+                testMove = cosineMove;
+                testPivot = cosinePivot;
+            }
+            telemetry.addData("MaxSpeed", testLF);
+            telemetry.addData("MaxMove", testLF);
+            telemetry.addData("MaxPivot", testLF);
+            telemetry.update();
 
         }
     }
