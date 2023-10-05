@@ -128,8 +128,8 @@ public class Drive extends LinearOpMode {
                 testPivot = cosinePivot;
             }
             telemetry.addData("MaxSpeed", testLF);
-            telemetry.addData("MaxMove", testLF);
-            telemetry.addData("MaxPivot", testLF);
+            telemetry.addData("MaxMove", testMove);
+            telemetry.addData("MaxPivot", testPivot);
             telemetry.update();
 
         }
