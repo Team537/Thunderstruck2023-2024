@@ -6,6 +6,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.hardware.IMU;
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
@@ -20,6 +21,8 @@ public class Drive extends LinearOpMode {
     private DcMotor rf_motor = null;
     private DcMotor lb_motor = null;
     private DcMotor rb_motor = null;
+    private DcMotor arm = null;
+    private Servo launcher = null;
 
     //defining imu variable
     IMU imu = null;
@@ -46,12 +49,20 @@ public class Drive extends LinearOpMode {
         rf_motor = hardwareMap.get(DcMotor.class, "rf_motor");
         lb_motor = hardwareMap.get(DcMotor.class, "lb_motor");
         rb_motor = hardwareMap.get(DcMotor.class, "rb_motor");
+        arm = hardwareMap.get(DcMotor.class, "arm");
+        launcher = hardwareMap.get(Servo.class,"launcher");
 
         //configuring motors so they move in the right direction
         lf_motor.setDirection(DcMotorSimple.Direction.REVERSE);
         rf_motor.setDirection(DcMotorSimple.Direction.FORWARD);
         lb_motor.setDirection(DcMotorSimple.Direction.REVERSE);
         rb_motor.setDirection(DcMotorSimple.Direction.FORWARD);
+        arm.setDirection(DcMotorSimple.Direction.FORWARD);
+
+        arm.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        arm.setTargetPosition(0);
+        arm.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        launcher.setPosition(0);
 
         //attaching imu to variable and getting the gyroscope set up
         imu = hardwareMap.get(IMU.class,"imu");
@@ -120,6 +131,20 @@ public class Drive extends LinearOpMode {
             double rf = sineMove - sinePivot;
             double rb = cosineMove - cosinePivot;
             double lb = sineMove + sinePivot;
+
+            if (gamepad1.a) {
+                arm.setTargetPosition(42);
+            }
+
+            if (gamepad1.b) {
+                arm.setTargetPosition(0);
+            }
+
+            //launcher.setPosition(1);
+
+            if (gamepad1.left_bumper && gamepad1.right_bumper) {
+                launcher.setPosition(1);
+            }
 
         }
     }
