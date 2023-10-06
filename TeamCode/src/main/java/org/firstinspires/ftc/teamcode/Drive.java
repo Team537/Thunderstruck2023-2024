@@ -38,10 +38,6 @@ public class Drive extends LinearOpMode {
     double mag = 0;
     double startAngle = 0;
 
-    double testLF = 0;
-    double testMove = 0;
-    double testPivot = 0;
-
     @Override
     public void runOpMode() {
 
@@ -83,14 +79,21 @@ public class Drive extends LinearOpMode {
             y = -gamepad1.left_stick_y;
             rx = gamepad1.right_stick_x;
 
+            mag = Math.sqrt(x*x + y*y);
+            if (mag > 1) {
+                x = x/mag;
+                y = y/mag;
+            }
+
+            if (Math.abs(rx) > 1) {
+                rx = rx/Math.abs(rx);
+            }
+
             xRot = x * Math.cos(-botHeading) - y * Math.sin(-botHeading);
             yRot = x * Math.sin(-botHeading) + y * Math.cos(-botHeading);
 
             cosineMove = (yRot + xRot)/Math.sqrt(2);
             sineMove = (yRot - xRot)/Math.sqrt(2);
-
-            //calculating the magnitude of the new points
-            mag = Math.sqrt(cosineMove*cosineMove + sineMove*sineMove);
 
             //because the function divides by the magnitude, we have to run two functions if mag = 0 to avoid dividing by zero. Just so you know, the limit of the second function as x approaches 0 is 1, so they are essentially identical
             if (mag == 0) {
@@ -101,7 +104,7 @@ public class Drive extends LinearOpMode {
 
             } else {
 
-                //setting the rotation speeds to the right stick x variable multiplied by a chaning function which ensures that the motor speed can't exceed 0, resulting in smoother movement
+                //setting the rotation speeds to the right stick x variable multiplied by a changing function which ensures that the motor speed can't exceed 0, resulting in smoother movement
                 cosinePivot = rx * ((1 - mag) + (sineMove * sineMove) / (2 * mag));
                 sinePivot = rx * ((1 - mag) + (cosineMove * cosineMove) / (2 * mag));
 
@@ -117,20 +120,6 @@ public class Drive extends LinearOpMode {
             double rf = sineMove - sinePivot;
             double rb = cosineMove - cosinePivot;
             double lb = sineMove + sinePivot;
-
-            telemetry.addData("Left Front", lf);
-            telemetry.addData("Right Front", rf);
-            telemetry.addData("Right Back", rb);
-            telemetry.addData("Left Back", lb);
-            if (Math.abs(lf) > testLF) {
-                testLF = Math.abs(lf);
-                testMove = cosineMove;
-                testPivot = cosinePivot;
-            }
-            telemetry.addData("MaxSpeed", testLF);
-            telemetry.addData("MaxMove", testMove);
-            telemetry.addData("MaxPivot", testPivot);
-            telemetry.update();
 
         }
     }
