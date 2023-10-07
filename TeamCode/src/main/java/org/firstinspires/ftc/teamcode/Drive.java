@@ -67,6 +67,7 @@ public class Drive extends LinearOpMode {
         arm.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         arm.setTargetPosition(0);
         arm.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        arm.setPower(1);
         launcher.setPosition(0);
         wrist.setPosition(0.8);
         claw.setPower(0);
@@ -86,7 +87,7 @@ public class Drive extends LinearOpMode {
         while (opModeIsActive()) {
 
             //resets the gyroscope when button is clicked
-            if (gamepad1.guide) {
+            if (gamepad1.back) {
                 imu.resetYaw();
             }
 
@@ -139,19 +140,19 @@ public class Drive extends LinearOpMode {
             double rb = cosineMove - cosinePivot;
             double lb = sineMove + sinePivot;
 
-            if (gamepad1.dpad_up) {
+            if (gamepad1.left_bumper) {
                 arm.setTargetPosition(-42);
             }
 
-            if (gamepad1.dpad_down) {
+            if (gamepad1.right_bumper) {
                 arm.setTargetPosition(0);
             }
 
-            if (gamepad1.dpad_left) {
+            if (gamepad1.x) {
                 wrist.setPosition(0.6);
             }
 
-            if (gamepad1.dpad_right) {
+            if (gamepad1.y) {
                 wrist.setPosition(0.8);
             }
 
@@ -165,7 +166,7 @@ public class Drive extends LinearOpMode {
                 }
             }
 
-            if (gamepad1.left_bumper && gamepad1.right_bumper) {
+            if (gamepad1.guide) {
                 launcher.setPosition(1);
             }
 
