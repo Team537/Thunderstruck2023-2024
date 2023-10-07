@@ -7,6 +7,7 @@ import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.hardware.IMU;
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
@@ -23,6 +24,8 @@ public class Drive extends LinearOpMode {
     private DcMotor rb_motor = null;
     private DcMotor arm = null;
     private Servo launcher = null;
+    private Servo wrist = null;
+    private CRServo claw = null;
 
     //defining imu variable
     IMU imu = null;
@@ -51,6 +54,8 @@ public class Drive extends LinearOpMode {
         rb_motor = hardwareMap.get(DcMotor.class, "rb_motor");
         arm = hardwareMap.get(DcMotor.class, "arm");
         launcher = hardwareMap.get(Servo.class,"launcher");
+        wrist = hardwareMap.get(Servo.class,"wrist");
+        claw = hardwareMap.get(CRServo.class,"claw");
 
         //configuring motors so they move in the right direction
         lf_motor.setDirection(DcMotorSimple.Direction.REVERSE);
@@ -63,6 +68,8 @@ public class Drive extends LinearOpMode {
         arm.setTargetPosition(0);
         arm.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         launcher.setPosition(0);
+        wrist.setPosition(0.8);
+        claw.setPower(0);
 
         //attaching imu to variable and getting the gyroscope set up
         imu = hardwareMap.get(IMU.class,"imu");
@@ -132,19 +139,38 @@ public class Drive extends LinearOpMode {
             double rb = cosineMove - cosinePivot;
             double lb = sineMove + sinePivot;
 
-            if (gamepad1.a) {
-                arm.setTargetPosition(42);
+            if (gamepad1.dpad_up) {
+                arm.setTargetPosition(-42);
             }
 
-            if (gamepad1.b) {
+            if (gamepad1.dpad_down) {
                 arm.setTargetPosition(0);
             }
 
-            //launcher.setPosition(1);
+            if (gamepad1.dpad_left) {
+                wrist.setPosition(0.6);
+            }
+
+            if (gamepad1.dpad_right) {
+                wrist.setPosition(0.8);
+            }
+
+            if (gamepad1.a == gamepad1.b) {
+                claw.setPower(0);
+            } else {
+                if (gamepad1.a) {
+                    claw.setPower(1);
+                } else {
+                    claw.setPower(-1);
+                }
+            }
 
             if (gamepad1.left_bumper && gamepad1.right_bumper) {
                 launcher.setPosition(1);
             }
+
+            telemetry.addData("armPos",arm.getCurrentPosition());
+            telemetry.update();
 
         }
     }
