@@ -10,10 +10,12 @@ import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 
 public class Auto {
     //defining motor variables
-    private DcMotor lf_motor = null;
-    private DcMotor rf_motor = null;
-    private DcMotor lb_motor = null;
-    private DcMotor rb_motor = null;
+    private DcMotor lfMotor = null;
+    private DcMotor rfMotor = null;
+    private DcMotor lbMotor = null;
+    private DcMotor rbMotor = null;
+
+    Drivetrain drivetrain = new Drivetrain(lfMotor,rfMotor,lbMotor,rbMotor);
 
     //defining imu variable
     IMU imu = null;
@@ -41,9 +43,9 @@ public class Auto {
         }
 
         if (true /*detect switch 3*/) {
-            endPosition = EndPosition.CLOSE;
+            endPosition = EndPosition.CORNER;
         } else {
-            endPosition = EndPosition.FAR;
+            endPosition = EndPosition.MIDDLE;
         }
 
         runAuto(false, alliance, startPosition, endPosition);
@@ -70,6 +72,6 @@ enum StartPosition {
 }
 
 enum EndPosition {
-    CLOSE,
-    FAR,
+    CORNER,
+    MIDDLE,
 }

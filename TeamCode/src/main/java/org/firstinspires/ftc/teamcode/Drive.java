@@ -16,10 +16,12 @@ import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 public class Drive extends LinearOpMode {
 
     //defining motor variables
-    private DcMotor lf_motor = null;
-    private DcMotor rf_motor = null;
-    private DcMotor lb_motor = null;
-    private DcMotor rb_motor = null;
+    private DcMotor lfMotor = null;
+    private DcMotor rfMotor = null;
+    private DcMotor lbMotor = null;
+    private DcMotor rbMotor = null;
+
+    Drivetrain drivetrain = new Drivetrain(lfMotor,rfMotor,lbMotor,rbMotor);
 
     //defining imu variable
     IMU imu = null;
@@ -37,16 +39,16 @@ public class Drive extends LinearOpMode {
     public void runOpMode() {
 
         //attaching motors to variables
-        lf_motor = hardwareMap.get(DcMotor.class, "lf_motor");
-        rf_motor = hardwareMap.get(DcMotor.class, "rf_motor");
-        lb_motor = hardwareMap.get(DcMotor.class, "lb_motor");
-        rb_motor = hardwareMap.get(DcMotor.class, "rb_motor");
+        lfMotor = hardwareMap.get(DcMotor.class, "lf_motor");
+        rfMotor = hardwareMap.get(DcMotor.class, "rf_motor");
+        lbMotor = hardwareMap.get(DcMotor.class, "lb_motor");
+        rbMotor = hardwareMap.get(DcMotor.class, "rb_motor");
 
         //configuring motors so they move in the right direction
-        lf_motor.setDirection(DcMotorSimple.Direction.REVERSE);
-        rf_motor.setDirection(DcMotorSimple.Direction.FORWARD);
-        lb_motor.setDirection(DcMotorSimple.Direction.REVERSE);
-        rb_motor.setDirection(DcMotorSimple.Direction.FORWARD);
+        lfMotor.setDirection(DcMotorSimple.Direction.REVERSE);
+        rfMotor.setDirection(DcMotorSimple.Direction.FORWARD);
+        lbMotor.setDirection(DcMotorSimple.Direction.REVERSE);
+        rbMotor.setDirection(DcMotorSimple.Direction.FORWARD);
 
         //attaching imu to variable and getting the gyroscope set up
         imu = hardwareMap.get(IMU.class,"imu");
@@ -76,12 +78,7 @@ public class Drive extends LinearOpMode {
             y = -gamepad1.left_stick_y;
             rx = gamepad1.right_stick_x;
 
-            motorMatrix.setMotorMatrixFromCartesian(x,y,rx,botHeading);
-
-            lf_motor.setPower(motorMatrix.lf);
-            rf_motor.setPower(motorMatrix.rf);
-            rb_motor.setPower(motorMatrix.rb);
-            lb_motor.setPower(motorMatrix.lb);
+            drivetrain.runDrivetrainFromCartesian(x,y,rx,botHeading);
 
         }
     }
