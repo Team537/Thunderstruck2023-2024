@@ -9,6 +9,7 @@ import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.hardware.IMU;
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
@@ -21,14 +22,13 @@ public class Drive extends LinearOpMode {
     //defining drivetrain
     Drivetrain drivetrain = new Drivetrain();
 
+    private DcMotor arm = null;
+    private Servo launcher = null;
+    private Servo wrist = null;
+    private CRServo claw = null;
+
     //defining imu variable
     IMU imu;
-
-    //defining arm, wirst, claw, and launcher variables
-    DcMotor arm;
-    Servo wrist;
-    CRServo claw;
-    Servo launcher;
 
     //defining color sensor
     ColorSensor colorSensor;
@@ -49,6 +49,19 @@ public class Drive extends LinearOpMode {
 
         new Initalize().initializeRobot(drivetrain, imu, arm, wrist, claw, launcher, colorSensor, settingSwitches);
 
+        arm = hardwareMap.get(DcMotor.class, "arm");
+        launcher = hardwareMap.get(Servo.class,"launcher");
+        wrist = hardwareMap.get(Servo.class,"wrist");
+        claw = hardwareMap.get(CRServo.class,"claw");
+
+        arm.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        arm.setTargetPosition(0);
+        arm.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        arm.setPower(1);
+        launcher.setPosition(0);
+        wrist.setPosition(0.8);
+        claw.setPower(0);
+
         //wait until the start button is clicked
         waitForStart();
 
@@ -59,7 +72,7 @@ public class Drive extends LinearOpMode {
         while (opModeIsActive()) {
 
             //resets the gyroscope when button is clicked
-            if (gamepad1.guide) {
+            if (gamepad1.back) {
                 imu.resetYaw();
             }
 
@@ -71,6 +84,36 @@ public class Drive extends LinearOpMode {
             rx = gamepad1.right_stick_x;
 
             drivetrain.runDrivetrainFromCartesian(x,y,rx,botHeading);
+
+            if (gamepad1.left_bumper) {
+                arm.setTargetPosition(-42);
+            }
+
+            if (gamepad1.right_bumper) {
+                arm.setTargetPosition(0);
+            }
+
+            if (gamepad1.x) {
+                wrist.setPosition(0.6);
+            }
+
+            if (gamepad1.y) {
+                wrist.setPosition(0.8);
+            }
+
+            if (gamepad1.a == gamepad1.b) {
+                claw.setPower(0);
+            } else {
+                if (gamepad1.a) {
+                    claw.setPower(1);
+                } else {
+                    claw.setPower(-1);
+                }
+            }
+
+            if (gamepad1.guide) {
+                launcher.setPosition(1);
+            }
 
         }
     }
