@@ -10,13 +10,6 @@ public class Drivetrain {
     DcMotor rbMotor;
     DcMotor lbMotor;
 
-    public Drivetrain(DcMotor lfMotor, DcMotor rfMotor, DcMotor lbMotor, DcMotor rbMotor) {
-        this.lfMotor = lfMotor;
-        this.rfMotor = rfMotor;
-        this.lbMotor = lbMotor;
-        this.rbMotor = rbMotor;
-    }
-
     public void runDrivetrain(@NonNull MotorMatrix motorMatrix) {
         lfMotor.setPower(motorMatrix.lf);
         rfMotor.setPower(motorMatrix.rf);

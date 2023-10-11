@@ -15,7 +15,7 @@ public class Auto {
     private DcMotor lbMotor = null;
     private DcMotor rbMotor = null;
 
-    Drivetrain drivetrain = new Drivetrain(lfMotor,rfMotor,lbMotor,rbMotor);
+    Drivetrain drivetrain = new Drivetrain();
 
     //defining imu variable
     IMU imu = null;

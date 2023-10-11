@@ -44,8 +44,6 @@ public class Drive extends LinearOpMode {
     double rx = 0;
     double startAngle = 0;
 
-    MotorMatrix motorMatrix;
-
     @Override
     public void runOpMode() {
 
