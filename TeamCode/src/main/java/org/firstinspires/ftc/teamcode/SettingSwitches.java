@@ -3,16 +3,13 @@ package org.firstinspires.ftc.teamcode;
 import com.qualcomm.robotcore.hardware.TouchSensor;
 
 public class SettingSwitches {
+
+    //defining variables for each switch
     TouchSensor alliance;
     TouchSensor startPosition;
     TouchSensor endPosition;
 
-    public void SettingSwitches(TouchSensor alliance,TouchSensor startPosition,TouchSensor endPosition) {
-        this.alliance = alliance;
-        this.startPosition = startPosition;
-        this.endPosition = endPosition;
-    }
-
+    //defining functions for each touch sensor to return its boolean value
     public boolean getAlliance() {
         return alliance.isPressed();
     }

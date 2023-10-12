@@ -3,116 +3,85 @@ package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Servo;
-import com.qualcomm.robotcore.hardware.CRServo;
-import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.hardware.IMU;
-import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
+
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 
 @TeleOp(name = "Drive")
 
 public class Drive extends LinearOpMode {
 
-    //defining drivetrain
-    Drivetrain drivetrain = new Drivetrain();
-
-    private DcMotor arm = null;
-    private Servo launcher = null;
-    private Servo wrist = null;
-    private CRServo claw = null;
-
-    //defining imu variable
-    IMU imu;
-
-    //defining color sensor
-    ColorSensor colorSensor;
-
-    //defining setting-switchew
-    SettingSwitches settingSwitches = new SettingSwitches();
-
-
-    //defining variables which are used later in the code
-    double botHeading = 0;
+    //defining variables used later in the code
     double x = 0;
     double y = 0;
     double rx = 0;
-    double startAngle = 0;
+
+    //creating a robot object, every input (ex. reading a sensor value) and output (ex. running a motor) is ran through this class
+    Robot robot = new Robot();
 
     @Override
     public void runOpMode() {
 
-        new Initalize().initializeRobot(drivetrain, imu, arm, wrist, claw, launcher, colorSensor, settingSwitches);
-
-        arm = hardwareMap.get(DcMotor.class, "arm");
-        launcher = hardwareMap.get(Servo.class,"launcher");
-        wrist = hardwareMap.get(Servo.class,"wrist");
-        claw = hardwareMap.get(CRServo.class,"claw");
-
-        arm.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        arm.setTargetPosition(0);
-        arm.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        arm.setPower(1);
-        launcher.setPosition(0);
-        wrist.setPosition(0.8);
-        claw.setPower(0);
-
         //wait until the start button is clicked
         waitForStart();
 
-        //calculating start angle (this is subtracted from the gyroscope so "forward" is always the direction the robot faces upon initialization
-        startAngle = imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS);
+        //this attaches actual functions to attributes found within the robot object
+        robot.initializeRobot();
 
         //loop that runs while the program is active
         while (opModeIsActive()) {
 
             //resets the gyroscope when button is clicked
             if (gamepad1.back) {
-                imu.resetYaw();
+                robot.imu.resetYaw();
             }
 
-            //calculating bot heading using the gyroscope subtracted by the initial orientation. pi/4 is added to this, as mecanum wheels drive as if they are on a pi/4 radian angle
-            botHeading = imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS) - startAngle;
-
+            //setting variables to gamepad values
             x = gamepad1.left_stick_x;
             y = -gamepad1.left_stick_y;
             rx = gamepad1.right_stick_x;
 
-            drivetrain.runDrivetrainFromCartesian(x,y,rx,botHeading);
+            //setting the drivetrain speed as a function of input values
+            robot.drivetrain.runDrivetrainFromCartesian(x,y,rx,robot.getBotHeading());
 
+            //setting arm to go up (-80 ticks) when the left bumper is pressed
             if (gamepad1.left_bumper) {
-                arm.setTargetPosition(-42);
+                robot.arm.setTargetPosition(-80);
             }
 
+            //setting arm to go down (0 ticks) when the right bumper is pressed
             if (gamepad1.right_bumper) {
-                arm.setTargetPosition(0);
+                robot.arm.setTargetPosition(0);
             }
 
+            //moving the wrist down when the x button is pressed
             if (gamepad1.x) {
-                wrist.setPosition(0.6);
+                robot.wrist.setPosition(0.6);
             }
 
+            //moving the wrist up when the x button is pressed
             if (gamepad1.y) {
-                wrist.setPosition(0.8);
+                robot.wrist.setPosition(0.8);
             }
 
+            //setting the claw to move in, out, or neither depending on what combination of boolean inputs a and b give
             if (gamepad1.a == gamepad1.b) {
-                claw.setPower(0);
+                robot.claw.setPower(0);
             } else {
                 if (gamepad1.a) {
-                    claw.setPower(1);
+                    robot.claw.setPower(1);
                 } else {
-                    claw.setPower(-1);
+                    robot.claw.setPower(-1);
                 }
             }
 
+            //launching the paper airplane when the guide button is clicked
             if (gamepad1.guide) {
-                launcher.setPosition(1);
+                robot.launcher.setPosition(1);
             }
 
         }

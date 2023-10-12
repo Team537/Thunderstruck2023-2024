@@ -11,11 +11,31 @@ import com.qualcomm.robotcore.hardware.IMU;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.TouchSensor;
 
-public class Initalize {
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 
-    public void initializeRobot(Drivetrain drivetrain, IMU imu, DcMotor arm, Servo wrist, CRServo claw, Servo launcher, ColorSensor colorSensor, SettingSwitches settingSwitches) {
-        //attaching motors to variables
+public class Robot {
 
+    //defining attributes which will be used in the code (sensors, motors, and other variables)
+    Drivetrain drivetrain = new Drivetrain();
+    IMU imu;
+    DcMotor arm;
+    Servo wrist;
+    CRServo claw;
+    Servo launcher;
+    Servo dropper;
+    ColorSensor colorSensor;
+    SettingSwitches settingSwitches;
+    private double startAngle;
+
+    //returns the bot heading of the robot by subtracting the reading from the initial angle
+    public double getBotHeading() {
+        return imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS) - startAngle;
+    }
+
+    //attaches attributes to physical inputs and outputs, and makes sure all the motors/servos are in the correct position
+    public void initializeRobot() {
+
+        //attaching the individual motors of drivetrain
         drivetrain.lfMotor = hardwareMap.get(DcMotor.class, "lf_motor");
         drivetrain.rfMotor = hardwareMap.get(DcMotor.class, "rf_motor");
         drivetrain.lbMotor = hardwareMap.get(DcMotor.class, "lb_motor");
@@ -32,11 +52,37 @@ public class Initalize {
         IMU.Parameters parameters = new IMU.Parameters(new RevHubOrientationOnRobot(RevHubOrientationOnRobot.LogoFacingDirection.UP,RevHubOrientationOnRobot.UsbFacingDirection.RIGHT));
         imu.initialize(parameters);
 
+        //getting the initial angle on the robot
+        startAngle = imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS);
+
+        //attaching arm/launcher motors and servos
+        arm = hardwareMap.get(DcMotor.class, "arm");
+        wrist = hardwareMap.get(Servo.class,"wrist");
+        claw = hardwareMap.get(CRServo.class,"claw");
+        launcher = hardwareMap.get(Servo.class,"launcher");
+        dropper = hardwareMap.get(Servo.class,"dropper");
+
+        //configuring the arm so it is in the right mode at the right power
+        arm.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        arm.setTargetPosition(0);
+        arm.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        arm.setPower(1);
+
+        //setting up the servos to be in the right position
+        wrist.setPosition(0.8);
+        claw.setPower(0);
+        launcher.setPosition(0);
+        dropper.setPosition(0);
+
+        //attaching color sensor
         colorSensor = hardwareMap.get(ColorSensor.class,"colorSensor");
 
+        //attaching settingSwitches touch sensors
         settingSwitches.alliance = hardwareMap.get(TouchSensor.class,"alliance");
         settingSwitches.startPosition = hardwareMap.get(TouchSensor.class,"startPosition");
         settingSwitches.endPosition = hardwareMap.get(TouchSensor.class,"endPosition");
+
+
     }
 
 
