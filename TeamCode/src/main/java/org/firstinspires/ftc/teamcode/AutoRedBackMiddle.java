@@ -5,11 +5,11 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 @Autonomous(name="Auto-RED-BACK-MIDDLE")
 
-public class AutoRedBackMiddle extends LinearOpMode {
+public class AutoRedBackMiddle extends Auto {
 
     @Override
     public void runOpMode() {
-        new Auto().runAutoFromParameters(Alliance.RED,StartPosition.BACKSTAGE,EndPosition.MIDDLE);
+        runAutoFromParameters(Alliance.RED,StartPosition.BACKSTAGE,EndPosition.MIDDLE);
     }
 
 }

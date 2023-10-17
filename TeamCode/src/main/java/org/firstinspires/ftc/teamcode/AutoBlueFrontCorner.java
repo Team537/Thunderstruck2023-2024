@@ -5,11 +5,11 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 @Autonomous(name="Auto-BLUE-FRONT-CORNER")
 
-public class AutoBlueFrontCorner extends LinearOpMode {
+public class AutoBlueFrontCorner extends Auto {
 
     @Override
     public void runOpMode() {
-        new Auto().runAutoFromParameters(Alliance.BLUE,StartPosition.FRONTSTAGE,EndPosition.CORNER);
+        runAutoFromParameters(Alliance.BLUE,StartPosition.FRONTSTAGE,EndPosition.CORNER);
     }
 
 }

@@ -24,12 +24,21 @@ public class Robot {
     Servo launcher;
     Servo dropper;
     ColorSensor colorSensor;
-    SettingSwitches settingSwitches;
     private double startAngle;
 
     //returns the bot heading of the robot by subtracting the reading from the initial angle
     public double getBotHeading() {
         return imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS) - startAngle;
+    }
+
+    //launches the paper drone
+    public void launchDrone() {
+        launcher.setPosition(1);
+    }
+
+    //drops the purple pixel on the spike mark during autonomous
+    public void dropPixel() {
+        dropper.setPosition(1);
     }
 
     //attaches attributes to physical inputs and outputs, and makes sure all the motors/servos are in the correct position
@@ -76,12 +85,6 @@ public class Robot {
 
         //attaching color sensor
         colorSensor = hardwareMap.get(ColorSensor.class,"colorSensor");
-
-        //attaching settingSwitches touch sensors
-        settingSwitches.alliance = hardwareMap.get(TouchSensor.class,"alliance");
-        settingSwitches.startPosition = hardwareMap.get(TouchSensor.class,"startPosition");
-        settingSwitches.endPosition = hardwareMap.get(TouchSensor.class,"endPosition");
-
 
     }
 

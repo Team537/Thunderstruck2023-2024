@@ -5,11 +5,11 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 @Autonomous(name="Auto-SENSORS")
 
-public class AutoSensors extends LinearOpMode {
+public class AutoSensors extends Auto {
 
     @Override
     public void runOpMode() {
-        new Auto().runAutoFromSensors();
+        runAutoFromSensors();
     }
 
 }

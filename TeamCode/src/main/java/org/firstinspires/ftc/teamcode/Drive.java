@@ -20,7 +20,7 @@ public class Drive extends LinearOpMode {
     double y = 0;
     double rx = 0;
 
-    //creating a robot object, every input (ex. reading a sensor value) and output (ex. running a motor) is ran through this class
+    //creating a robot object, every input (ex. reading a sensor value) and output (ex. running a motor) is run through this class
     Robot robot = new Robot();
 
     @Override
@@ -81,7 +81,7 @@ public class Drive extends LinearOpMode {
 
             //launching the paper airplane when the guide button is clicked
             if (gamepad1.guide) {
-                robot.launcher.setPosition(1);
+                robot.launchDrone();
             }
 
         }
