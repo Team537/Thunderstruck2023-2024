@@ -109,6 +109,7 @@ public abstract class Auto extends LinearOpMode{
             telemetry.update();
 
         }
+
         runAuto(false, alliance, startPosition, endPosition);
     }
 
