@@ -141,7 +141,7 @@ public class Drive extends LinearOpMode {
             double lb = sineMove + sinePivot;
 
             if (gamepad1.left_bumper) {
-                arm.setTargetPosition(-42);
+                arm.setTargetPosition(-160);
             }
 
             if (gamepad1.right_bumper) {
@@ -171,6 +171,7 @@ public class Drive extends LinearOpMode {
             }
 
             telemetry.addData("armPos",arm.getCurrentPosition());
+            telemetry.addData("servoTarget",claw.getPower());
             telemetry.update();
 
         }
