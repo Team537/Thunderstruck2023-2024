@@ -11,7 +11,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 
-public abstract class Auto extends LinearOpMode{
+public abstract class Auto extends LinearOpMode {
 
     //defining a robot and allowing for opMode functions to be used in the object
     Robot robot = new Robot();

@@ -9,6 +9,7 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.IMU;
 import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 
@@ -24,6 +25,7 @@ public class Robot {
     Servo dropper;
     ColorSensor colorSensor;
     private double startAngle;
+    public LinearOpMode opMode;
 
     //returns the bot heading of the robot by subtracting the reading from the initial angle
     public double getBotHeading() {
@@ -32,7 +34,7 @@ public class Robot {
 
     //launches the paper drone
     public void launchDrone() {
-        launcher.setPosition(1);
+        launcher.setPosition(0);
     }
 
     //drops the purple pixel on the spike mark during autonomous
@@ -44,10 +46,10 @@ public class Robot {
     public void initializeRobot() {
 
         //attaching the individual motors of drivetrain
-        drivetrain.lfMotor = hardwareMap.get(DcMotor.class, "lf_motor");
-        drivetrain.rfMotor = hardwareMap.get(DcMotor.class, "rf_motor");
-        drivetrain.lbMotor = hardwareMap.get(DcMotor.class, "lb_motor");
-        drivetrain.rbMotor = hardwareMap.get(DcMotor.class, "rb_motor");
+        drivetrain.lfMotor = opMode.hardwareMap.get(DcMotor.class, "lf_motor");
+        drivetrain.rfMotor = opMode.hardwareMap.get(DcMotor.class, "rf_motor");
+        drivetrain.lbMotor = opMode.hardwareMap.get(DcMotor.class, "lb_motor");
+        drivetrain.rbMotor = opMode.hardwareMap.get(DcMotor.class, "rb_motor");
 
         //configuring motors so they move in the right direction
         drivetrain.lfMotor.setDirection(DcMotorSimple.Direction.REVERSE);
@@ -56,7 +58,7 @@ public class Robot {
         drivetrain.rbMotor.setDirection(DcMotorSimple.Direction.FORWARD);
 
         //attaching imu to variable and getting the gyroscope set up
-        imu = hardwareMap.get(IMU.class,"imu");
+        imu = opMode.hardwareMap.get(IMU.class,"imu");
         IMU.Parameters parameters = new IMU.Parameters(new RevHubOrientationOnRobot(RevHubOrientationOnRobot.LogoFacingDirection.UP,RevHubOrientationOnRobot.UsbFacingDirection.RIGHT));
         imu.initialize(parameters);
 
@@ -64,11 +66,11 @@ public class Robot {
         startAngle = imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS);
 
         //attaching arm/launcher motors and servos
-        arm = hardwareMap.get(DcMotor.class, "arm");
-        wrist = hardwareMap.get(Servo.class,"wrist");
-        claw = hardwareMap.get(CRServo.class,"claw");
-        launcher = hardwareMap.get(Servo.class,"launcher");
-        dropper = hardwareMap.get(Servo.class,"dropper");
+        arm = opMode.hardwareMap.get(DcMotor.class, "arm");
+        wrist = opMode.hardwareMap.get(Servo.class,"wrist");
+        claw = opMode.hardwareMap.get(CRServo.class,"claw");
+        launcher = opMode.hardwareMap.get(Servo.class,"launcher");
+        dropper = opMode.hardwareMap.get(Servo.class,"dropper");
 
         //configuring the arm so it is in the right mode at the right power
         arm.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
@@ -79,11 +81,11 @@ public class Robot {
         //setting up the servos to be in the right position
         wrist.setPosition(0.8);
         claw.setPower(0);
-        launcher.setPosition(0);
+        launcher.setPosition(1);
         dropper.setPosition(0);
 
         //attaching color sensor
-        colorSensor = hardwareMap.get(ColorSensor.class,"colorSensor");
+        colorSensor = opMode.hardwareMap.get(ColorSensor.class,"colorSensor");
 
     }
 
