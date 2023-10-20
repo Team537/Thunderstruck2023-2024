@@ -68,7 +68,7 @@ public class Drive extends LinearOpMode {
         arm.setTargetPosition(0);
         arm.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         arm.setPower(1);
-        launcher.setPosition(0);
+        launcher.setPosition(1);
         wrist.setPosition(0.8);
         claw.setPower(0);
 
@@ -142,11 +142,17 @@ public class Drive extends LinearOpMode {
 
             if (gamepad1.left_bumper) {
                 arm.setTargetPosition(-160);
+                arm.setPower(0.5);
             }
 
             if (gamepad1.right_bumper) {
                 arm.setTargetPosition(0);
+                arm.setPower(0.3);
             }
+
+            double armOffset = Math.abs(arm.getCurrentPosition() - arm.getTargetPosition());
+
+            //arm.setPower( ( 2 / ( 1 + Math.pow(Math.E,-armOffset/50))) - 1 );
 
             if (gamepad1.x) {
                 wrist.setPosition(0.6);
@@ -167,11 +173,12 @@ public class Drive extends LinearOpMode {
             }
 
             if (gamepad1.guide) {
-                launcher.setPosition(1);
+                launcher.setPosition(0);
             }
 
             telemetry.addData("armPos",arm.getCurrentPosition());
             telemetry.addData("servoTarget",claw.getPower());
+            telemetry.addData("bButtonInput",gamepad1.b);
             telemetry.update();
 
         }
