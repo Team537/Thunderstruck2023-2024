@@ -50,15 +50,16 @@ public class Drive extends LinearOpMode {
 
             //setting arm to go up (-80 ticks) when the left bumper is pressed
             if (gamepad1.left_bumper) {
-                robot.arm.setTargetPosition(-80);
+                robot.arm.setTargetPosition(-160);
+                robot.arm.setPower(0.5);
             }
 
             //setting arm to go down (0 ticks) when the right bumper is pressed
             if (gamepad1.right_bumper) {
                 robot.arm.setTargetPosition(0);
+                robot.arm.setPower(0.3);
             }
 
-            //moving the wrist down when the x button is pressed
             if (gamepad1.x) {
                 robot.wrist.setPosition(0.6);
             }
