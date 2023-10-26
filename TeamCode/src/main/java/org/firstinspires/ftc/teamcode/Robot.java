@@ -1,7 +1,5 @@
 package org.firstinspires.ftc.teamcode;
 
-import static org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion.hardwareMap;
-
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.ColorSensor;
@@ -22,10 +20,14 @@ public class Robot {
     Servo wrist;
     CRServo claw;
     Servo launcher;
-    Servo dropper;
+    CRServo dropper;
     ColorSensor colorSensor;
     private double startAngle;
-    public LinearOpMode opMode;
+    private LinearOpMode opMode;
+
+    public Robot(LinearOpMode linearOpMode) {
+        this.opMode = linearOpMode;
+    }
 
     //returns the bot heading of the robot by subtracting the reading from the initial angle
     public double getBotHeading() {
@@ -39,7 +41,9 @@ public class Robot {
 
     //drops the purple pixel on the spike mark during autonomous
     public void dropPixel() {
-        dropper.setPosition(1);
+        dropper.setPower(1);
+        opMode.sleep(1000);
+        dropper.setPower(0);
     }
 
     //attaches attributes to physical inputs and outputs, and makes sure all the motors/servos are in the correct position
@@ -70,7 +74,7 @@ public class Robot {
         wrist = opMode.hardwareMap.get(Servo.class,"wrist");
         claw = opMode.hardwareMap.get(CRServo.class,"claw");
         launcher = opMode.hardwareMap.get(Servo.class,"launcher");
-        dropper = opMode.hardwareMap.get(Servo.class,"dropper");
+        dropper = opMode.hardwareMap.get(CRServo.class,"dropper");
 
         //configuring the arm so it is in the right mode at the right power
         arm.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
@@ -82,10 +86,10 @@ public class Robot {
         wrist.setPosition(0.8);
         claw.setPower(0);
         launcher.setPosition(1);
-        dropper.setPosition(0);
+        dropper.setPower(0);
 
         //attaching color sensor
-        colorSensor = opMode.hardwareMap.get(ColorSensor.class,"colorSensor");
+        colorSensor = opMode.hardwareMap.get(ColorSensor.class,"color_sensor");
 
     }
 

@@ -21,7 +21,7 @@ public class Drive extends LinearOpMode {
     double rx = 0;
 
     //creating a robot object, every input (ex. reading a sensor value) and output (ex. running a motor) is run through this class
-    Robot robot = new Robot();
+    Robot robot = new Robot(this);
 
     @Override
     public void runOpMode() {
@@ -49,23 +49,23 @@ public class Drive extends LinearOpMode {
             robot.drivetrain.runDrivetrainFromCartesian(x,y,rx,robot.getBotHeading());
 
             //setting arm to go up (-80 ticks) when the left bumper is pressed
-            if (gamepad1.left_bumper) {
+            if (gamepad1.x) {
                 robot.arm.setTargetPosition(-160);
                 robot.arm.setPower(0.5);
             }
 
             //setting arm to go down (0 ticks) when the right bumper is pressed
-            if (gamepad1.right_bumper) {
+            if (gamepad1.y) {
                 robot.arm.setTargetPosition(0);
                 robot.arm.setPower(0.3);
             }
 
-            if (gamepad1.x) {
+            if (gamepad1.left_bumper) {
                 robot.wrist.setPosition(0.6);
             }
 
             //moving the wrist up when the x button is pressed
-            if (gamepad1.y) {
+            if (gamepad1.right_bumper) {
                 robot.wrist.setPosition(0.8);
             }
 
@@ -84,6 +84,10 @@ public class Drive extends LinearOpMode {
             if (gamepad1.guide) {
                 robot.launchDrone();
             }
+
+            telemetry.addData("botHeading",robot.getBotHeading());
+            telemetry.addData("botHeadingReal",robot.imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS));
+            telemetry.update();
 
         }
     }

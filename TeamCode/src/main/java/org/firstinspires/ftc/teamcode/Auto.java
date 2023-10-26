@@ -14,7 +14,7 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 public abstract class Auto extends LinearOpMode {
 
     //defining a robot and allowing for opMode functions to be used in the object
-    Robot robot = new Robot();
+    Robot robot = new Robot(this);
     ElapsedTime runtime = new ElapsedTime();
 
     //sleeps for s seconds using the robots internal clock
