@@ -11,6 +11,11 @@ public class Initialize extends LinearOpMode {
 
     public void runOpMode() {
         robot.initializeRobot();
+        waitForStart();
+
+        while (opModeIsActive()) {
+        }
+
     }
 
 }

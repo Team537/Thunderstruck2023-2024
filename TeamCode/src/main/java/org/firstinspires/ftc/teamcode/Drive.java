@@ -50,33 +50,31 @@ public class Drive extends LinearOpMode {
 
             //setting arm to go up (-80 ticks) when the left bumper is pressed
             if (gamepad1.x) {
-                robot.arm.setTargetPosition(-160);
-                robot.arm.setPower(0.5);
+                robot.arm.setTargetPosition(-340);
+                robot.arm.setPower(1);
             }
 
             //setting arm to go down (0 ticks) when the right bumper is pressed
             if (gamepad1.y) {
                 robot.arm.setTargetPosition(0);
-                robot.arm.setPower(0.3);
-            }
-
-            if (gamepad1.left_bumper) {
-                robot.wrist.setPosition(0.6);
-            }
-
-            //moving the wrist up when the x button is pressed
-            if (gamepad1.right_bumper) {
-                robot.wrist.setPosition(0.8);
+                if (robot.arm.getCurrentPosition() < -300) {
+                    robot.arm.setPower(1);
+                } else {
+                    robot.arm.setPower(0.3);
+                }
             }
 
             //setting the claw to move in, out, or neither depending on what combination of boolean inputs a and b give
             if (gamepad1.a == gamepad1.b) {
                 robot.claw.setPower(0);
+                robot.wrist.setPosition(0.7);
             } else {
                 if (gamepad1.a) {
                     robot.claw.setPower(1);
+                    robot.wrist.setPosition(0.7);
                 } else {
                     robot.claw.setPower(-1);
+                    robot.wrist.setPosition(0.65);
                 }
             }
 
@@ -84,10 +82,6 @@ public class Drive extends LinearOpMode {
             if (gamepad1.guide) {
                 robot.launchDrone();
             }
-
-            telemetry.addData("botHeading",robot.getBotHeading());
-            telemetry.addData("botHeadingReal",robot.imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS));
-            telemetry.update();
 
         }
     }
