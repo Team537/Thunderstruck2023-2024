@@ -20,7 +20,7 @@ public abstract class Auto extends LinearOpMode {
     //sleeps for s seconds using the robots internal clock
     public void smartSleep(double seconds) {
         runtime.reset();
-        while (opModeIsActive() && (runtime.seconds() < seconds) ) {
+        while (opModeIsActive() && (runtime.seconds() < seconds)) {
         }
     }
 
@@ -41,7 +41,7 @@ public abstract class Auto extends LinearOpMode {
         boolean xState = false;
 
         //Init loop to swap between auto settings
-        while ( !isStarted() ) {
+        while (!isStarted()) {
 
             //Toggle alliance on rising edge of a button
             if (gamepad1.a) {
@@ -87,23 +87,23 @@ public abstract class Auto extends LinearOpMode {
 
             //displaying alliance settings
             if (alliance == Alliance.RED) {
-                telemetry.addData("Alliance","RED");
+                telemetry.addData("Alliance", "RED");
             } else {
-                telemetry.addData("Alliance","BLUE");
+                telemetry.addData("Alliance", "BLUE");
             }
 
             //displaying start position settings
             if (startPosition == startPosition.BACKSTAGE) {
-                telemetry.addData("Start Position","BACKSTAGE");
+                telemetry.addData("Start Position", "BACKSTAGE");
             } else {
-                telemetry.addData("Start Position","FRONTSTAGE");
+                telemetry.addData("Start Position", "FRONTSTAGE");
             }
 
             //displaying end position settings
             if (endPosition == EndPosition.CORNER) {
-                telemetry.addData("End Position","CORNER");
+                telemetry.addData("End Position", "CORNER");
             } else {
-                telemetry.addData("End Position","MIDDLE");
+                telemetry.addData("End Position", "MIDDLE");
             }
 
             telemetry.update();
@@ -120,7 +120,7 @@ public abstract class Auto extends LinearOpMode {
     //running the auto, except it will use parameters to determine what to do
     public void runAutoFromSensors() {
         waitForStart();
-        runAuto(true,Alliance.RED,StartPosition.FRONTSTAGE,EndPosition.CORNER);
+        runAuto(true, Alliance.RED, StartPosition.FRONTSTAGE, EndPosition.CORNER);
     }
 
     public void runAuto(boolean useSensors, Alliance alliance, StartPosition startPosition, EndPosition endPosition) {
@@ -142,15 +142,15 @@ public abstract class Auto extends LinearOpMode {
         waitForStart();
 
         smartSleep(1);
-        robot.drivetrain.runDrivetrainFromCartesian(0, 0.5, 0,robot.getBotHeading());
+        robot.drivetrain.runDrivetrainFromCartesian(0, 0.5, 0, robot.getBotHeading());
         smartSleep(1);
         robot.drivetrain.stop();
         robot.arm.setTargetPosition(-80);
         smartSleep(1);
 
-        robot.drivetrain.runDrivetrainFromCartesian(0,0,-0.5,robot.getBotHeading());
+        robot.drivetrain.runDrivetrainFromCartesian(0, 0, -0.5, robot.getBotHeading());
         smartSleep(1);
-        robot.drivetrain.runDrivetrainFromCartesian(0.5,0,0,robot.getBotHeading());
+        robot.drivetrain.runDrivetrainFromCartesian(0.5, 0, 0, robot.getBotHeading());
         smartSleep(1);
         robot.drivetrain.stop();
         if (alliance == Alliance.RED) {
@@ -161,19 +161,4 @@ public abstract class Auto extends LinearOpMode {
 
     }
 
-}
-
-enum Alliance {
-    RED,
-    BLUE,
-}
-
-enum StartPosition {
-    FRONTSTAGE,
-    BACKSTAGE,
-}
-
-enum EndPosition {
-    CORNER,
-    MIDDLE,
 }
