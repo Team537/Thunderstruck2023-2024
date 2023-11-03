@@ -135,10 +135,6 @@ public abstract class Auto extends LinearOpMode {
         runAuto(false, alliance, startPosition, endPosition);
     }
 
-    public void runOpMode() {
-
-    }
-
     //running the auto, except it will use parameters to determine what to do
     public void runAutoFromSensors() {
         waitForStart();
