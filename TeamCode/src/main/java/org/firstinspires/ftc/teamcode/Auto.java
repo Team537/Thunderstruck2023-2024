@@ -1,5 +1,12 @@
 package org.firstinspires.ftc.teamcode;
 
+import static org.firstinspires.ftc.teamcode.Alliance.BLUE;
+import static org.firstinspires.ftc.teamcode.Alliance.RED;
+import static org.firstinspires.ftc.teamcode.EndPosition.CORNER;
+import static org.firstinspires.ftc.teamcode.EndPosition.MIDDLE;
+import static org.firstinspires.ftc.teamcode.StartPosition.BACKSTAGE;
+import static org.firstinspires.ftc.teamcode.StartPosition.FRONTSTAGE;
+
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
@@ -33,77 +40,92 @@ public abstract class Auto extends LinearOpMode {
     public void runAutoFromSettings() {
 
         Alliance alliance = Alliance.RED;
-        StartPosition startPosition = StartPosition.BACKSTAGE;
-        EndPosition endPosition = EndPosition.CORNER;
+        StartPosition startPosition = BACKSTAGE;
+        EndPosition endPosition = CORNER;
 
-        boolean aState = false;
-        boolean bState = false;
-        boolean xState = false;
+        boolean allianceState = false;
+        boolean startPositionState = false;
+        boolean endPositionState = false;
 
         //Init loop to swap between auto settings
         while (!isStarted()) {
 
             //Toggle alliance on rising edge of a button
             if (gamepad1.a) {
-                if (aState == false) {
-                    if (alliance == Alliance.RED) {
-                        alliance = Alliance.BLUE;
-                    } else {
-                        alliance = Alliance.RED;
+                if (allianceState == false) {
+                    switch (alliance) {
+                        case RED:
+                            alliance = BLUE;
+                            break;
+                        case BLUE:
+                            alliance = RED;
+                            break;
                     }
                 }
-                aState = true;
+                allianceState = true;
             } else {
-                aState = false;
+                allianceState = false;
             }
 
             //Toggle start position on rising edge of b button
             if (gamepad1.b) {
-                if (bState == false) {
-                    if (startPosition == StartPosition.BACKSTAGE) {
-                        startPosition = StartPosition.FRONTSTAGE;
-                    } else {
-                        startPosition = StartPosition.BACKSTAGE;
+                if (startPositionState == false) {
+                    switch (startPosition) {
+                        case BACKSTAGE:
+                            startPosition = FRONTSTAGE;
+                            break;
+                        case FRONTSTAGE:
+                            startPosition = BACKSTAGE;
+                            break;
                     }
                 }
-                bState = true;
+                startPositionState = true;
             } else {
-                bState = false;
+                startPositionState = false;
             }
 
             //Toggle end position on rising edge of x button
             if (gamepad1.x) {
-                if (xState == false) {
-                    if (endPosition == EndPosition.CORNER) {
-                        endPosition = EndPosition.MIDDLE;
-                    } else {
-                        endPosition = EndPosition.CORNER;
+                if (endPositionState == false) {
+                    switch (endPosition) {
+                        case CORNER:
+                            endPosition = MIDDLE;
+                            break;
+                        case MIDDLE:
+                            endPosition = CORNER;
+                            break;
                     }
                 }
-                xState = true;
+                endPositionState = true;
             } else {
-                xState = false;
+                endPositionState = false;
             }
 
             //displaying alliance settings
-            if (alliance == Alliance.RED) {
-                telemetry.addData("Alliance", "RED");
-            } else {
-                telemetry.addData("Alliance", "BLUE");
+            switch (alliance) {
+                case RED:
+                    telemetry.addData("Alliance:","RED");
+                    break;
+                case BLUE:
+                    telemetry.addData("Alliance:","BLUE");
             }
 
             //displaying start position settings
-            if (startPosition == startPosition.BACKSTAGE) {
-                telemetry.addData("Start Position", "BACKSTAGE");
-            } else {
-                telemetry.addData("Start Position", "FRONTSTAGE");
+            switch (startPosition) {
+                case BACKSTAGE:
+                    telemetry.addData("Start Position:","BACKSTAGE");
+                    break;
+                case FRONTSTAGE:
+                    telemetry.addData("Start Position:","FRONTSTAGE");
             }
 
             //displaying end position settings
-            if (endPosition == EndPosition.CORNER) {
-                telemetry.addData("End Position", "CORNER");
-            } else {
-                telemetry.addData("End Position", "MIDDLE");
+            switch (endPosition) {
+                case CORNER:
+                    telemetry.addData("End Position:","CORNER");
+                    break;
+                case MIDDLE:
+                    telemetry.addData("End Position:","MIDDLE");
             }
 
             telemetry.update();
@@ -120,7 +142,7 @@ public abstract class Auto extends LinearOpMode {
     //running the auto, except it will use parameters to determine what to do
     public void runAutoFromSensors() {
         waitForStart();
-        runAuto(true, Alliance.RED, StartPosition.FRONTSTAGE, EndPosition.CORNER);
+        runAuto(true, Alliance.RED, FRONTSTAGE, CORNER);
     }
 
     public void runAuto(boolean useSensors, Alliance alliance, StartPosition startPosition, EndPosition endPosition) {

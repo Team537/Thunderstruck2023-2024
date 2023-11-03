@@ -1,6 +1,8 @@
 //Importing packages
 package org.firstinspires.ftc.teamcode;
 
+import static org.firstinspires.ftc.teamcode.Alliance.*;
+
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.CRServo;
@@ -24,7 +26,7 @@ public class Drive extends LinearOpMode {
 
     boolean driveModeToggle = false;
 
-    Alliance alliance = Alliance.RED;
+    Alliance alliance = RED;
 
     boolean allianceToggle = false;
 
@@ -44,10 +46,13 @@ public class Drive extends LinearOpMode {
             //Toggle alliance on rising edge of a button
             if (gamepad1.a) {
                 if (allianceToggle == false) {
-                    if (alliance == Alliance.RED) {
-                        alliance = Alliance.BLUE;
-                    } else {
-                        alliance = Alliance.RED;
+                    switch (alliance) {
+                        case RED:
+                            alliance = BLUE;
+                            break;
+                        case BLUE:
+                            alliance = RED;
+                            break;
                     }
                 }
                 allianceToggle = true;
@@ -56,12 +61,13 @@ public class Drive extends LinearOpMode {
             }
 
             //displaying alliance settings
-            if (alliance == Alliance.RED) {
-                telemetry.addData("Alliance","RED");
-            } else {
-                telemetry.addData("Alliance","BLUE");
+            switch (alliance) {
+                case RED:
+                    telemetry.addData("Alliance:","RED");
+                    break;
+                case BLUE:
+                telemetry.addData("Alliance:","BLUE");
             }
-
             telemetry.update();
 
         }
@@ -110,14 +116,14 @@ public class Drive extends LinearOpMode {
                     //setting the claw to move in, out, or neither depending on what combination of boolean inputs a and b give
                     if (gamepad1.a == gamepad1.b) {
                         robot.claw.setPower(0);
-                        robot.wrist.setPosition(0.7);
+                        robot.wrist.setPosition(0.8);
                     } else {
                         if (gamepad1.a) {
                             robot.claw.setPower(1);
-                            robot.wrist.setPosition(0.7);
+                            robot.wrist.setPosition(0.8);
                         } else {
                             robot.claw.setPower(-1);
-                            robot.wrist.setPosition(0.65);
+                            robot.wrist.setPosition(0.75);
                         }
                     }
 
@@ -137,8 +143,25 @@ public class Drive extends LinearOpMode {
 
             }
 
-            //Toggle scoring position on rising edge of a button
+            //Toggle alliance on rising edge of a button
             if (gamepad2.a) {
+                if (allianceToggle == false) {
+                    switch (alliance) {
+                        case RED:
+                            alliance = BLUE;
+                            break;
+                        case BLUE:
+                            alliance = RED;
+                            break;
+                    }
+                }
+                allianceToggle = true;
+            } else {
+                allianceToggle = false;
+            }
+
+            //Toggle scoring position on rising edge of a button
+            if (gamepad2.b) {
                 if (scoringPositionToggle == false) {
                     switch (scoringPosition) {
                         case LEFT:
@@ -173,24 +196,32 @@ public class Drive extends LinearOpMode {
             }
 
             //displaying alliance settings
+            switch (alliance) {
+                case RED:
+                    telemetry.addData("Alliance:","RED");
+                    break;
+                case BLUE:
+                    telemetry.addData("Alliance:","BLUE");
+            }
+
             switch (scoringPosition) {
                 case LEFT:
-                    telemetry.addData("Scoring Position","LEFT");
+                    telemetry.addData("Scoring Position:","LEFT");
                     break;
                 case CENTER:
-                    telemetry.addData("Scoring Position","CENTER");
+                    telemetry.addData("Scoring Position:","CENTER");
                     break;
                 case RIGHT:
-                    telemetry.addData("Scoring Position","RIGHT");
+                    telemetry.addData("Scoring Position:","RIGHT");
                     break;
             }
 
             switch (driveMode) {
                 case MANUALDRIVE:
-                    telemetry.addData("Drive Mode","Manual Drive");
+                    telemetry.addData("Drive Mode:","Manual Drive");
                     break;
                 case AUTOSCORE:
-                    telemetry.addData("Drive Mode","Auto Scoring");
+                    telemetry.addData("Drive Mode:","Auto Scoring");
                     break;
             }
 

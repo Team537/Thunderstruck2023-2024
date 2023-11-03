@@ -63,7 +63,7 @@ public class Robot {
 
         //attaching imu to variable and getting the gyroscope set up
         imu = opMode.hardwareMap.get(IMU.class,"imu");
-        IMU.Parameters parameters = new IMU.Parameters(new RevHubOrientationOnRobot(RevHubOrientationOnRobot.LogoFacingDirection.UP,RevHubOrientationOnRobot.UsbFacingDirection.RIGHT));
+        IMU.Parameters parameters = new IMU.Parameters(new RevHubOrientationOnRobot(RevHubOrientationOnRobot.LogoFacingDirection.UP,RevHubOrientationOnRobot.UsbFacingDirection.LEFT));
         imu.initialize(parameters);
 
         //getting the initial angle on the robot
@@ -83,7 +83,7 @@ public class Robot {
         arm.setPower(1);
 
         //setting up the servos to be in the right position
-        wrist.setPosition(0.65);
+        wrist.setPosition(1);
         claw.setPower(0);
         launcher.setPosition(1);
         dropper.setPower(0);
