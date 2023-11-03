@@ -9,6 +9,7 @@ import com.qualcomm.robotcore.hardware.IMU;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
+import org.firstinspires.ftc.robotcore.external.hardware.camera.Camera;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 
 public class Robot {
@@ -22,6 +23,7 @@ public class Robot {
     Servo launcher;
     CRServo dropper;
     ColorSensor colorSensor;
+    Camera camera;
     private double startAngle;
     private LinearOpMode opMode;
 
