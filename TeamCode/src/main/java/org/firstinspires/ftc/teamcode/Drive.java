@@ -24,7 +24,9 @@ public class Drive extends LinearOpMode {
 
     DriveMode driveMode = DriveMode.MANUALDRIVE;
 
-    boolean driveModeToggle = false;
+    DriveMode driveModeSetting = DriveMode.MANUALDRIVE;
+
+    boolean driveModeSettingToggle = false;
 
     Alliance alliance = RED;
 
@@ -78,6 +80,11 @@ public class Drive extends LinearOpMode {
         //loop that runs while the program is active
         while (opModeIsActive()) {
 
+            robot.update();
+
+            telemetry.addData("Position:",robot.getPosition().string());
+            telemetry.addData("Orientation:",robot.getBotHeading());
+
             //running drive mode specific code
             switch (driveMode) {
                 case MANUALDRIVE:
@@ -95,7 +102,7 @@ public class Drive extends LinearOpMode {
                     rx = gamepad1.right_stick_x;
 
                     //setting the drivetrain speed as a function of input values
-                    robot.drivetrain.runDrivetrainFromCartesian(x,y,rx,robot.getBotHeading());
+                    robot.drivetrain.runDrivetrainFromCartesian(new Vector(x,y),rx,robot.getBotHeading());
 
                     //setting arm to go up (-80 ticks) when the left bumper is pressed
                     if (gamepad1.x) {
@@ -106,11 +113,7 @@ public class Drive extends LinearOpMode {
                     //setting arm to go down (0 ticks) when the right bumper is pressed
                     if (gamepad1.y) {
                         robot.arm.setTargetPosition(0);
-                        if (robot.arm.getCurrentPosition() < -300) {
-                            robot.arm.setPower(1);
-                        } else {
-                            robot.arm.setPower(0.3);
-                        }
+                        robot.arm.setPower(0.8);
                     }
 
                     //setting the claw to move in, out, or neither depending on what combination of boolean inputs a and b give
@@ -130,6 +133,10 @@ public class Drive extends LinearOpMode {
                     //launching the paper airplane when the guide button is clicked
                     if (gamepad1.guide) {
                         robot.launchDrone();
+                    }
+
+                    if (gamepad1.left_trigger > 0 && gamepad1.right_trigger > 0) {
+                        robot.dropPixel();
                     }
 
                     break;
@@ -175,24 +182,30 @@ public class Drive extends LinearOpMode {
                             break;
                     }
                 }
-                allianceToggle = true;
+                scoringPositionToggle = true;
             } else {
-                allianceToggle = false;
+                scoringPositionToggle = false;
             }
 
-            if (gamepad2.guide) {
-                if (driveModeToggle == false) {
-                    switch (driveMode) {
+            if (gamepad2.x) {
+                if (driveModeSettingToggle == false) {
+                    switch (driveModeSetting) {
                         case MANUALDRIVE:
-                            driveMode = DriveMode.AUTOSCORE;
+                            driveModeSetting = DriveMode.AUTOSCORE;
                             break;
                         case AUTOSCORE:
-                            driveMode = DriveMode.MANUALDRIVE;
+                            driveModeSetting = DriveMode.MANUALDRIVE;
                             break;
                     }
                 }
+                driveModeSettingToggle = true;
             } else {
-                driveModeToggle = false;
+                driveModeSettingToggle = false;
+            }
+
+            //commit drive mode when guide button is clicked
+            if (gamepad2.guide) {
+                driveMode = driveModeSetting;
             }
 
             //displaying alliance settings
@@ -216,12 +229,23 @@ public class Drive extends LinearOpMode {
                     break;
             }
 
-            switch (driveMode) {
+            switch (driveModeSetting) {
                 case MANUALDRIVE:
-                    telemetry.addData("Drive Mode:","Manual Drive");
+                    telemetry.addData("Drive Mode Setting:","Manual Drive");
                     break;
                 case AUTOSCORE:
-                    telemetry.addData("Drive Mode:","Auto Scoring");
+                    telemetry.addData("Drive Mode Setting:","Auto Scoring");
+                    break;
+            }
+
+            telemetry.addData("Press [GUIDE] to commit mode","");
+
+            switch (driveMode) {
+                case MANUALDRIVE:
+                    telemetry.addData("Drive Mode Setting:","Manual Drive");
+                    break;
+                case AUTOSCORE:
+                    telemetry.addData("Drive Mode Setting:","Auto Scoring");
                     break;
             }
 

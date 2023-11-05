@@ -22,31 +22,51 @@ public class Robot {
     Servo launcher;
     CRServo dropper;
     ColorSensor colorSensor;
+    final double TICKS_PER_INCH = 57.953;
     private double startAngle;
     private LinearOpMode opMode;
+    private Vector position = new Vector(0,0);
+    private double lastLFPosition;
+    private double lastRFPosition;
+    private double lastRBPosition;
+    private double lastLBPosition;
+    private double lfPosition;
+    private double rfPosition;
+    private double rbPosition;
+    private double lbPosition;
 
     public Robot(LinearOpMode linearOpMode) {
         this.opMode = linearOpMode;
     }
 
-    //returns the bot heading of the robot by subtracting the reading from the initial angle
+    /**
+     * returns the bot heading of the robot
+     * @return bot heading of the robot in radians
+     */
+
     public double getBotHeading() {
-        return imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS) - startAngle;
+        return -(imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS) - startAngle);
     }
 
-    //launches the paper drone
+    /**
+     * launches the paper drone
+     */
     public void launchDrone() {
         launcher.setPosition(0);
     }
 
-    //drops the purple pixel on the spike mark during autonomous
+    /**
+     * drops the purple pixel on the spike mark during autonomous
+     */
     public void dropPixel() {
         dropper.setPower(1);
         opMode.sleep(1000);
         dropper.setPower(0);
     }
 
-    //attaches attributes to physical inputs and outputs, and makes sure all the motors/servos are in the correct position
+    /**
+     * attaches attributes to physical inputs and outputs, and makes sure all the motors/servos are in the correct position
+     */
     public void initializeRobot() {
 
         //attaching the individual motors of drivetrain
@@ -91,7 +111,40 @@ public class Robot {
         //attaching color sensor
         colorSensor = opMode.hardwareMap.get(ColorSensor.class,"color_sensor");
 
+        lastLFPosition = drivetrain.lfMotor.getCurrentPosition();
+        lastRFPosition = drivetrain.rfMotor.getCurrentPosition();
+        lastRBPosition = drivetrain.rbMotor.getCurrentPosition();
+        lastLBPosition = drivetrain.lbMotor.getCurrentPosition();
+
     }
 
+    /**
+     * updates the coordinates of the robot
+     */
+    public void update() {
+        lfPosition = drivetrain.lfMotor.getCurrentPosition();
+        rfPosition = drivetrain.rfMotor.getCurrentPosition();
+        rbPosition = drivetrain.rbMotor.getCurrentPosition();
+        lbPosition = drivetrain.lbMotor.getCurrentPosition();
+        double angle = -this.getBotHeading();
+        Vector lfVector = Vector.rotate( Vector.multiply( new Vector(Math.sqrt(2) / 2, Math.sqrt(2) / 2), lfPosition - lastLFPosition ), angle);
+        Vector rfVector = Vector.rotate( Vector.multiply( new Vector(-Math.sqrt(2) / 2, Math.sqrt(2) / 2), rfPosition - lastRFPosition ), angle);
+        Vector rbVector = Vector.rotate( Vector.multiply( new Vector(Math.sqrt(2) / 2, Math.sqrt(2) / 2), rbPosition - lastRBPosition ), angle);
+        Vector lbVector = Vector.rotate( Vector.multiply( new Vector(-Math.sqrt(2) / 2, Math.sqrt(2) / 2), lbPosition - lastLBPosition ), angle);
+        Vector totalVector = Vector.add( Vector.add(lfVector,rfVector), Vector.add(rbVector,lbVector) );
+        position = Vector.add(position,totalVector);
+        lastLFPosition = lfPosition;
+        lastRFPosition = rfPosition;
+        lastRBPosition = rbPosition;
+        lastLBPosition = lbPosition;
+    }
+
+    /**
+     * gets the position of the robot
+     * @return vector of the robot's offset in ticks
+     */
+    public Vector getPosition() {
+        return position;
+    }
 
 }

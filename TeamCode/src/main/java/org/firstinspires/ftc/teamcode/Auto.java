@@ -24,19 +24,30 @@ public abstract class Auto extends LinearOpMode {
     Robot robot = new Robot(this);
     ElapsedTime runtime = new ElapsedTime();
 
-    //sleeps for s seconds using the robots internal clock
+    /**
+     * sleeps for s seconds using the robots internal clock
+     * @param seconds time in seconds
+     */
+
     public void smartSleep(double seconds) {
         runtime.reset();
         while (opModeIsActive() && (runtime.seconds() < seconds)) {
         }
     }
 
-    //runs auto from manual parameters
+    /**
+     * runs auto from manual parameters
+     * @param alliance robot's alliance color
+     * @param startPosition robot's starting position
+     * @param endPosition robot's parking position
+     */
     public void runAutoFromParameters(Alliance alliance, StartPosition startPosition, EndPosition endPosition) {
         runAuto(false, alliance, startPosition, endPosition);
     }
 
-    //runs auto from manual switches mounted on the robot
+    /**
+     * runs auto from manual switches mounted on the robot
+     */
     public void runAutoFromSettings() {
 
         Alliance alliance = Alliance.RED;
@@ -135,12 +146,21 @@ public abstract class Auto extends LinearOpMode {
         runAuto(false, alliance, startPosition, endPosition);
     }
 
-    //running the auto, except it will use parameters to determine what to do
+    /**
+     * running the auto, except it will use parameters to determine what to do
+     */
     public void runAutoFromSensors() {
         waitForStart();
         runAuto(true, Alliance.RED, FRONTSTAGE, CORNER);
     }
 
+    /**
+     * runs the autonomous code
+     * @param useSensors whether or not the robot uses sensors to determine its position
+     * @param alliance robot's alliance color
+     * @param startPosition robot's starting position
+     * @param endPosition robot's parking position
+     */
     public void runAuto(boolean useSensors, Alliance alliance, StartPosition startPosition, EndPosition endPosition) {
 
         //attaching motor functions to robot object
@@ -160,15 +180,15 @@ public abstract class Auto extends LinearOpMode {
         waitForStart();
 
         smartSleep(1);
-        robot.drivetrain.runDrivetrainFromCartesian(0, 0.5, 0, robot.getBotHeading());
+        robot.drivetrain.runDrivetrainFromCartesian(new Vector(0,0.5), 0, robot.getBotHeading());
         smartSleep(1);
         robot.drivetrain.stop();
         robot.arm.setTargetPosition(-80);
         smartSleep(1);
 
-        robot.drivetrain.runDrivetrainFromCartesian(0, 0, -0.5, robot.getBotHeading());
+        robot.drivetrain.runDrivetrainFromCartesian(new Vector(0,0), -0.5, robot.getBotHeading());
         smartSleep(1);
-        robot.drivetrain.runDrivetrainFromCartesian(0.5, 0, 0, robot.getBotHeading());
+        robot.drivetrain.runDrivetrainFromCartesian(new Vector(0.5,0), 0, robot.getBotHeading());
         smartSleep(1);
         robot.drivetrain.stop();
         if (alliance == Alliance.RED) {

@@ -12,7 +12,10 @@ public class Drivetrain {
     DcMotor rbMotor;
     DcMotor lbMotor;
 
-    //runs drivetrain with a MotorMatrix parameter
+    /**
+     * runs drivetrain with a MotorMatrix parameter
+     * @param motorMatrix Object containing individual motor powers
+     */
     public void runDrivetrain(MotorMatrix motorMatrix) {
         lfMotor.setPower(motorMatrix.lf);
         rfMotor.setPower(motorMatrix.rf);
@@ -20,10 +23,15 @@ public class Drivetrain {
         rbMotor.setPower(motorMatrix.rb);
     }
 
-    //runs drivetrain with parameters; uses a MotorMatrix to calculate parameters
-    public void runDrivetrainFromCartesian(double x, double y, double rx, double botHeading) {
+    /**
+     * runs drivetrain with parameters; uses a MotorMatrix to calculate parameters
+     * @param linear the linear velocity vector
+     * @param rx the magnitude of the rotational vector
+     * @param botHeading the orientation of the robot
+     */
+    public void runDrivetrainFromCartesian(Vector linear, double rx, double botHeading) {
         MotorMatrix motorMatrix = new MotorMatrix();
-        motorMatrix.setMotorMatrixFromCartesian(x,y,rx,botHeading);
+        motorMatrix.setMotorMatrixFromCartesian(linear,rx,botHeading);
         lfMotor.setPower(motorMatrix.lf);
         rfMotor.setPower(motorMatrix.rf);
         lbMotor.setPower(motorMatrix.lb);

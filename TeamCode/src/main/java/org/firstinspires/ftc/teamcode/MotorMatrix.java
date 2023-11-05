@@ -8,15 +8,35 @@ public class MotorMatrix {
     double rb = 0;
     double lb = 0;
 
-    //calculating motor values from cartesian inputs <x,y> for linear velocity vector and rx for angular velocity
-    public void setMotorMatrixFromCartesian(double x, double y, double rx, double botHeading) {
+    public MotorMatrix() {}
+
+    /**
+     * creates a motor matrix
+     * @param lf left front motor power
+     * @param rf right front motor power
+     * @param rb right back motor power
+     * @param lb left back motor power
+     */
+    public MotorMatrix(double lf, double rf, double rb, double lb) {
+        this.lf = lf;
+        this.rf = rf;
+        this.rb = rb;
+        this.lb = lb;
+    }
+
+    /**
+     * calculating motor values from cartesian inputs <x,y> for linear velocity vector and rx for angular velocity
+     * @param linear the linear velocity vector
+     * @param rx the magnitude of the rotational vector
+     * @param botHeading the orientation of the robot (in radians)
+     */
+    public void setMotorMatrixFromCartesian(Vector linear, double rx, double botHeading) {
 
         //reducing <x,y> to a unit vector if its magnitude exceeds 1
         //this is important because quick joystick rotations can result in unpredictable values and the robot not turning in a correct direction
-        double mag = Math.sqrt(x*x + y*y);
+        double mag = linear.magnitude();
         if (mag > 1) {
-            x = x/mag;
-            y = y/mag;
+            linear = linear.unit();
         }
 
         //clamping rx to the domain [-1,1]
@@ -25,8 +45,8 @@ public class MotorMatrix {
         }
 
         //revolving x and y around the origin with -botHeading degrees angles. This makes the code field centric
-        double xRot = x * Math.cos(-botHeading) - y * Math.sin(-botHeading);
-        double yRot = x * Math.sin(-botHeading) + y * Math.cos(-botHeading);
+        double xRot = linear.x * Math.cos(botHeading) - linear.y * Math.sin(botHeading);
+        double yRot = linear.x * Math.sin(botHeading) + linear.y * Math.cos(botHeading);
 
         //calculating the values used for linear velocity of the motors
         double cosineMove = (yRot + xRot)/Math.sqrt(2);
