@@ -84,6 +84,7 @@ public class Drive extends LinearOpMode {
 
             telemetry.addData("Position:",robot.getPosition().string());
             telemetry.addData("Orientation:",robot.getBotHeading());
+            telemetry.addData("TEMPORARY-TESTING-START-ANGLE:",robot.startAngle);
 
             //running drive mode specific code
             switch (driveMode) {
@@ -119,14 +120,14 @@ public class Drive extends LinearOpMode {
                     //setting the claw to move in, out, or neither depending on what combination of boolean inputs a and b give
                     if (gamepad1.a == gamepad1.b) {
                         robot.claw.setPower(0);
-                        robot.wrist.setPosition(0.8);
+                        robot.wrist.setPosition(0.7);
                     } else {
                         if (gamepad1.a) {
                             robot.claw.setPower(1);
-                            robot.wrist.setPosition(0.8);
+                            robot.wrist.setPosition(0.7);
                         } else {
                             robot.claw.setPower(-1);
-                            robot.wrist.setPosition(0.75);
+                            robot.wrist.setPosition(0.65);
                         }
                     }
 

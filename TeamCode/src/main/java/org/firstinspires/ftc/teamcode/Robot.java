@@ -23,7 +23,7 @@ public class Robot {
     CRServo dropper;
     ColorSensor colorSensor;
     final double TICKS_PER_INCH = 57.953;
-    private double startAngle;
+    double startAngle;
     private LinearOpMode opMode;
     private Vector position = new Vector(0,0);
     private double lastLFPosition;
@@ -103,7 +103,7 @@ public class Robot {
         arm.setPower(1);
 
         //setting up the servos to be in the right position
-        wrist.setPosition(1);
+        wrist.setPosition(0.7);
         claw.setPower(0);
         launcher.setPosition(1);
         dropper.setPower(0);
