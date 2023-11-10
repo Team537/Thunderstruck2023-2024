@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.teamcode.Systems.Hardware;
 
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.hardware.CRServo;
@@ -10,20 +10,22 @@ import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.teamcode.Systems.Hardware.Subsystems.Drivetrain;
+import org.firstinspires.ftc.teamcode.Utilities.Vector;
 
 public class Robot {
 
     //defining attributes which will be used in the code (sensors, motors, and other variables)
-    Drivetrain drivetrain = new Drivetrain();
-    IMU imu;
-    DcMotor arm;
-    Servo wrist;
-    CRServo claw;
-    Servo launcher;
-    CRServo dropper;
-    ColorSensor colorSensor;
-    final double TICKS_PER_INCH = 57.953;
-    double startAngle;
+    public Drivetrain drivetrain = new Drivetrain();
+    public IMU imu;
+    public DcMotor arm;
+    public Servo wrist;
+    public CRServo claw;
+    public Servo launcher;
+    public CRServo dropper;
+    public ColorSensor colorSensor;
+    public final double TICKS_PER_INCH = 57.953;
+    public double startAngle;
     private LinearOpMode opMode;
     private Vector position = new Vector(0,0);
     private double lastLFPosition;

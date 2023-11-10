@@ -1,22 +1,21 @@
-package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.teamcode.Systems.Software;
 
-import static org.firstinspires.ftc.teamcode.Alliance.BLUE;
-import static org.firstinspires.ftc.teamcode.Alliance.RED;
-import static org.firstinspires.ftc.teamcode.EndPosition.CORNER;
-import static org.firstinspires.ftc.teamcode.EndPosition.MIDDLE;
-import static org.firstinspires.ftc.teamcode.StartPosition.BACKSTAGE;
-import static org.firstinspires.ftc.teamcode.StartPosition.FRONTSTAGE;
+import static org.firstinspires.ftc.teamcode.Systems.Software.SoftwareEnums.Alliance.BLUE;
+import static org.firstinspires.ftc.teamcode.Systems.Software.SoftwareEnums.Alliance.RED;
+import static org.firstinspires.ftc.teamcode.Systems.Software.SoftwareEnums.EndPosition.CORNER;
+import static org.firstinspires.ftc.teamcode.Systems.Software.SoftwareEnums.EndPosition.MIDDLE;
+import static org.firstinspires.ftc.teamcode.Systems.Software.SoftwareEnums.StartPosition.BACKSTAGE;
+import static org.firstinspires.ftc.teamcode.Systems.Software.SoftwareEnums.StartPosition.FRONTSTAGE;
 
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
-import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
-import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.util.ElapsedTime;
-import com.qualcomm.robotcore.hardware.IMU;
-import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
-import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+
+import org.firstinspires.ftc.teamcode.Systems.Software.SoftwareEnums.Alliance;
+import org.firstinspires.ftc.teamcode.Systems.Software.SoftwareEnums.EndPosition;
+import org.firstinspires.ftc.teamcode.Systems.Software.SoftwareEnums.StartPosition;
+import org.firstinspires.ftc.teamcode.Systems.Hardware.Robot;
+import org.firstinspires.ftc.teamcode.Utilities.Vector;
+
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 
 public abstract class Auto extends LinearOpMode {
 

@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.teamcode.Systems.Software.SoftwareEnums;
 
 public enum AutoScoringState {
     ORIENT,

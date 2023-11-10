@@ -1,15 +1,14 @@
 //Importing packages
-package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.teamcode.OpModes.TeleOps;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.hardware.CRServo;
-import com.qualcomm.robotcore.hardware.ColorSensor;
-import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.Servo;
-import com.qualcomm.robotcore.hardware.IMU;
 
-import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.teamcode.Systems.Software.SoftwareEnums.Alliance;
+import org.firstinspires.ftc.teamcode.Systems.Software.SoftwareEnums.DriveMode;
+import org.firstinspires.ftc.teamcode.Systems.Hardware.Robot;
+import org.firstinspires.ftc.teamcode.Systems.Software.SoftwareEnums.ScoringPosition;
+import org.firstinspires.ftc.teamcode.Utilities.Vector;
 
 @TeleOp(name = "Drive")
 

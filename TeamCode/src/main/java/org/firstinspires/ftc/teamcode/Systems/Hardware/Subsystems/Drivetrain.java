@@ -1,16 +1,17 @@
-package org.firstinspires.ftc.teamcode;
-
-import androidx.annotation.NonNull;
+package org.firstinspires.ftc.teamcode.Systems.Hardware.Subsystems;
 
 import com.qualcomm.robotcore.hardware.DcMotor;
+
+import org.firstinspires.ftc.teamcode.Utilities.MotorMatrix;
+import org.firstinspires.ftc.teamcode.Utilities.Vector;
 
 public class Drivetrain {
 
     //defining individual motor attributes
-    DcMotor lfMotor;
-    DcMotor rfMotor;
-    DcMotor rbMotor;
-    DcMotor lbMotor;
+    public DcMotor lfMotor;
+    public DcMotor rfMotor;
+    public DcMotor rbMotor;
+    public DcMotor lbMotor;
 
     /**
      * runs drivetrain with a MotorMatrix parameter

@@ -1,12 +1,12 @@
-package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.teamcode.Utilities;
 
 public class MotorMatrix {
 
     //defining variables of motor values
-    double lf = 0;
-    double rf = 0;
-    double rb = 0;
-    double lb = 0;
+    public double lf = 0;
+    public double rf = 0;
+    public double rb = 0;
+    public double lb = 0;
 
     public MotorMatrix() {}
 

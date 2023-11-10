@@ -1,9 +1,9 @@
-package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.teamcode.Utilities;
 
 public class Vector {
 
-    double x;
-    double y;
+    public double x;
+    public double y;
 
     public Vector unit() {
         return new Vector(this.x * this.magnitude(),this.y * this.magnitude());
