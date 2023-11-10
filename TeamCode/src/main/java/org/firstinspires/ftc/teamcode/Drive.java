@@ -1,8 +1,6 @@
 //Importing packages
 package org.firstinspires.ftc.teamcode;
 
-import static org.firstinspires.ftc.teamcode.Alliance.*;
-
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.CRServo;
@@ -28,7 +26,7 @@ public class Drive extends LinearOpMode {
 
     boolean driveModeSettingToggle = false;
 
-    Alliance alliance = RED;
+    Alliance alliance = Alliance.RED;
 
     boolean allianceToggle = false;
 
@@ -50,10 +48,10 @@ public class Drive extends LinearOpMode {
                 if (allianceToggle == false) {
                     switch (alliance) {
                         case RED:
-                            alliance = BLUE;
+                            alliance = Alliance.BLUE;
                             break;
                         case BLUE:
-                            alliance = RED;
+                            alliance = Alliance.RED;
                             break;
                     }
                 }
@@ -156,10 +154,10 @@ public class Drive extends LinearOpMode {
                 if (allianceToggle == false) {
                     switch (alliance) {
                         case RED:
-                            alliance = BLUE;
+                            alliance = Alliance.BLUE;
                             break;
                         case BLUE:
-                            alliance = RED;
+                            alliance = Alliance.RED;
                             break;
                     }
                 }

@@ -34,9 +34,12 @@ public class MotorMatrix {
 
         //reducing <x,y> to a unit vector if its magnitude exceeds 1
         //this is important because quick joystick rotations can result in unpredictable values and the robot not turning in a correct direction
-        double mag = linear.magnitude();
-        if (mag > 1) {
-            linear = linear.unit();
+        Vector condensedLinear;
+
+        if (linear.magnitude() > 1) {
+            condensedLinear = linear.unit();
+        } else {
+            condensedLinear = linear;
         }
 
         //clamping rx to the domain [-1,1]
@@ -45,15 +48,17 @@ public class MotorMatrix {
         }
 
         //revolving x and y around the origin with -botHeading degrees angles. This makes the code field centric
-        double xRot = linear.x * Math.cos(botHeading) - linear.y * Math.sin(botHeading);
-        double yRot = linear.x * Math.sin(botHeading) + linear.y * Math.cos(botHeading);
+
+        Vector rotatedLinear = Vector.rotate(condensedLinear,botHeading);
 
         //calculating the values used for linear velocity of the motors
-        double cosineMove = (yRot + xRot)/Math.sqrt(2);
-        double sineMove = (yRot - xRot)/Math.sqrt(2);
+        double cosineMove = (rotatedLinear.y + rotatedLinear.x)/Math.sqrt(2);
+        double sineMove = (rotatedLinear.y - rotatedLinear.x)/Math.sqrt(2);
 
         double cosinePivot;
         double sinePivot;
+
+        double mag = new Vector(cosineMove,sineMove).magnitude();
 
         //because the function divides by the magnitude, we have to run two functions if mag = 0 to avoid dividing by zero. Just so you know, the limit of the second function as s or c approaches 0 is 1
         if (mag == 0) {
