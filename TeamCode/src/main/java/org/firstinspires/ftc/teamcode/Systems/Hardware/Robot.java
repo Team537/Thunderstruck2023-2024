@@ -61,7 +61,7 @@ public class Robot {
      * drops the purple pixel on the spike mark during autonomous
      */
     public void dropPixel() {
-        dropper.setPower(1);
+        dropper.setPower(-1);
         opMode.sleep(1000);
         dropper.setPower(0);
     }
@@ -105,7 +105,7 @@ public class Robot {
         arm.setPower(1);
 
         //setting up the servos to be in the right position
-        wrist.setPosition(0.7);
+        wrist.setPosition(0.3);
         claw.setPower(0);
         launcher.setPosition(1);
         dropper.setPower(0);
