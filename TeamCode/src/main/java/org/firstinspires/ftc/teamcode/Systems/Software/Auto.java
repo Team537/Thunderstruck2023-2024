@@ -10,7 +10,9 @@ import static org.firstinspires.ftc.teamcode.Systems.Software.SoftwareEnums.Star
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.Systems.Software.SoftwareEnums.Alliance;
+import org.firstinspires.ftc.teamcode.Systems.Software.SoftwareEnums.DriveMode;
 import org.firstinspires.ftc.teamcode.Systems.Software.SoftwareEnums.EndPosition;
+import org.firstinspires.ftc.teamcode.Systems.Software.SoftwareEnums.PropPosition;
 import org.firstinspires.ftc.teamcode.Systems.Software.SoftwareEnums.StartPosition;
 import org.firstinspires.ftc.teamcode.Systems.Hardware.Robot;
 import org.firstinspires.ftc.teamcode.Utilities.Vector;
@@ -31,6 +33,7 @@ public abstract class Auto extends LinearOpMode {
     public void smartSleep(double seconds) {
         runtime.reset();
         while (opModeIsActive() && (runtime.seconds() < seconds)) {
+            robot.update();
         }
     }
 
@@ -162,6 +165,10 @@ public abstract class Auto extends LinearOpMode {
      */
     public void runAuto(boolean useSensors, Alliance alliance, StartPosition startPosition, EndPosition endPosition) {
 
+        PropPosition propPosition;
+
+        propPosition = PropPosition.MIDDLE;
+
         //attaching motor functions to robot object
         robot.initializeRobot();
 
@@ -180,21 +187,147 @@ public abstract class Auto extends LinearOpMode {
 
         smartSleep(1);
         robot.drivetrain.runDrivetrainFromCartesian(new Vector(0,0.5), 0, robot.getBotHeading());
-        smartSleep(1);
+        smartSleep(2.1);
         robot.drivetrain.stop();
-        robot.arm.setTargetPosition(-80);
         smartSleep(1);
 
-        robot.drivetrain.runDrivetrainFromCartesian(new Vector(0,0), -0.5, robot.getBotHeading());
-        smartSleep(1);
-        robot.drivetrain.runDrivetrainFromCartesian(new Vector(0.5,0), 0, robot.getBotHeading());
-        smartSleep(1);
+        robot.setTargetOrientation( Math.PI/2 );
+        robot.driveMode = DriveMode.ORIENT;
+        smartSleep(0.9); //0.9
+        robot.driveMode = DriveMode.MANUALDRIVE;
         robot.drivetrain.stop();
-        if (alliance == Alliance.RED) {
+        smartSleep(0.5);
 
-        } else {
+        //detect prop
+
+        robot.setTargetOrientation( Math.PI );
+        robot.driveMode = DriveMode.ORIENT;
+        smartSleep(0.9); //0.9
+        robot.driveMode = DriveMode.MANUALDRIVE;
+        robot.drivetrain.stop();
+        smartSleep(0.5);
+
+        //detect prop
+
+        robot.setTargetOrientation( 3 * (Math.PI/2) );
+        robot.driveMode = DriveMode.ORIENT;
+        smartSleep(0.9); //0.9
+        robot.driveMode = DriveMode.MANUALDRIVE;
+        smartSleep(0.5);
+
+        //detect prop
+
+        switch(propPosition) {
+            case LEFT:
+                robot.setTargetOrientation( Math.PI );
+                robot.driveMode = DriveMode.ORIENT;
+                smartSleep(0.9); //0.9
+                robot.driveMode = DriveMode.MANUALDRIVE;
+                robot.drivetrain.runDrivetrainFromCartesian(new Vector(-0.5,0), 0, robot.getBotHeading());
+                smartSleep(0.9);
+                robot.drivetrain.stop();
+                smartSleep(0.3);
+                robot.dropPixel();
+                smartSleep(0.3);
+
+                robot.drivetrain.runDrivetrainFromCartesian(new Vector(0.5,0),0,robot.getBotHeading());
+                smartSleep(0.9);
+                robot.setTargetOrientation( Math.PI/2 );
+                robot.driveMode = DriveMode.ORIENT;
+                smartSleep(0.9); //0.9
+                robot.driveMode = DriveMode.MANUALDRIVE;
+                robot.drivetrain.stop();
+
+                break;
+
+            case MIDDLE:
+                smartSleep(0.9);
+                robot.drivetrain.runDrivetrainFromCartesian(new Vector(0,0.5), 0, robot.getBotHeading());
+                smartSleep(0.9);
+                robot.drivetrain.stop();
+                smartSleep(0.3);
+                robot.dropPixel();
+                smartSleep(0.3);
+
+                robot.drivetrain.runDrivetrainFromCartesian(new Vector(0,-0.5),0,robot.getBotHeading());
+                smartSleep(0.9);
+                robot.setTargetOrientation( Math.PI/2 );
+                robot.driveMode = DriveMode.ORIENT;
+                smartSleep(0.9); //0.9
+                robot.driveMode = DriveMode.MANUALDRIVE;
+                robot.drivetrain.stop();
+                break;
+
+            case RIGHT:
+                robot.setTargetOrientation( 0 );
+                robot.driveMode = DriveMode.ORIENT;
+                smartSleep(0.9); //0.9
+                robot.driveMode = DriveMode.MANUALDRIVE;
+                robot.drivetrain.runDrivetrainFromCartesian(new Vector(0.5,0), 0, robot.getBotHeading());
+                smartSleep(0.9);
+                robot.drivetrain.stop();
+                smartSleep(0.3);
+                robot.dropPixel();
+                smartSleep(0.3);
+
+                robot.drivetrain.runDrivetrainFromCartesian(new Vector(-0.5,0),0,robot.getBotHeading());
+                smartSleep(0.9);
+                robot.setTargetOrientation( Math.PI/2 );
+                robot.driveMode = DriveMode.ORIENT;
+                smartSleep(0.9); //0.9
+                robot.driveMode = DriveMode.MANUALDRIVE;
+                robot.drivetrain.stop();
+                break;
+        }
+
+        // makes robot raise arm and drive towards board
+        robot.arm.setTargetPosition(-340);
+        robot.drivetrain.runDrivetrainFromCartesian(new Vector(-0.5, 0),0, robot.getBotHeading());
+        smartSleep(2.5);
+        robot.drivetrain.stop();
+
+        //moves drivetrain to right position for scoring
+        switch(propPosition){
+
+            case LEFT:
+                robot.drivetrain.runDrivetrainFromCartesian(new Vector(0, -0.5),0, robot.getBotHeading());
+                smartSleep(0.3);
+                robot.drivetrain.stop();
+                break;
+
+            case RIGHT:
+                robot.drivetrain.runDrivetrainFromCartesian(new Vector(0,0.5), 0, robot.getBotHeading());
+                smartSleep(0.3);
+                robot.drivetrain.stop();
+                break;
 
         }
+
+        robot.claw.setPower(1);
+        smartSleep(0.97);
+        robot.claw.setPower(0);
+
+        robot.arm.setTargetPosition(0);
+
+
+        //
+        switch(propPosition){
+
+            case LEFT:
+                robot.drivetrain.runDrivetrainFromCartesian(new Vector (0,0.5), 0, robot.getBotHeading());
+                smartSleep(0.3);
+                robot.drivetrain.stop();
+                break;
+
+
+            case RIGHT:
+                robot.drivetrain.runDrivetrainFromCartesian(new Vector (0,-0.5), 0, robot.getBotHeading());
+                smartSleep(0.3);
+                robot.drivetrain.stop();
+                break;
+        }
+
+
 
     }
 

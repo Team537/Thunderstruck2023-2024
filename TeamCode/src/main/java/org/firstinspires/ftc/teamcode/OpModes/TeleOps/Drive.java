@@ -4,6 +4,7 @@ package org.firstinspires.ftc.teamcode.OpModes.TeleOps;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.teamcode.Systems.Software.SoftwareEnums.Alliance;
 import org.firstinspires.ftc.teamcode.Systems.Software.SoftwareEnums.DriveMode;
 import org.firstinspires.ftc.teamcode.Systems.Hardware.Robot;
@@ -18,8 +19,6 @@ public class Drive extends LinearOpMode {
     double x = 0;
     double y = 0;
     double rx = 0;
-
-    DriveMode driveMode = DriveMode.MANUALDRIVE;
 
     DriveMode driveModeSetting = DriveMode.MANUALDRIVE;
 
@@ -81,10 +80,9 @@ public class Drive extends LinearOpMode {
 
             telemetry.addData("Position:",robot.getPosition().string());
             telemetry.addData("Orientation:",robot.getBotHeading());
-            telemetry.addData("TEMPORARY-TESTING-START-ANGLE:",robot.startAngle);
 
             //running drive mode specific code
-            switch (driveMode) {
+            switch (robot.driveMode) {
                 case MANUALDRIVE:
 
                     //Manual drive controls
@@ -110,21 +108,21 @@ public class Drive extends LinearOpMode {
 
                     //setting arm to go down (0 ticks) when the right bumper is pressed
                     if (gamepad1.y) {
-                        robot.arm.setTargetPosition(0);
+                        robot.arm.setTargetPosition(-10);
                         robot.arm.setPower(0.8);
                     }
 
                     //setting the claw to move in, out, or neither depending on what combination of boolean inputs a and b give
                     if (gamepad1.a == gamepad1.b) {
                         robot.claw.setPower(0);
-                        robot.wrist.setPosition(0.3);
+                        robot.wrist.setPosition(0.6);
                     } else {
                         if (gamepad1.a) {
                             robot.claw.setPower(1);
-                            robot.wrist.setPosition(0.3);
+                            robot.wrist.setPosition(0.4);
                         } else {
                             robot.claw.setPower(-1);
-                            robot.wrist.setPosition(0.25);
+                            robot.wrist.setPosition(0.35);
                         }
                     }
 
@@ -203,7 +201,7 @@ public class Drive extends LinearOpMode {
 
             //commit drive mode when guide button is clicked
             if (gamepad2.guide) {
-                driveMode = driveModeSetting;
+                robot.driveMode = driveModeSetting;
             }
 
             //displaying alliance settings
@@ -238,7 +236,7 @@ public class Drive extends LinearOpMode {
 
             telemetry.addData("Press [GUIDE] to commit mode","");
 
-            switch (driveMode) {
+            switch (robot.driveMode) {
                 case MANUALDRIVE:
                     telemetry.addData("Drive Mode Setting:","Manual Drive");
                     break;

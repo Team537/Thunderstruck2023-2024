@@ -1,7 +1,7 @@
 package org.firstinspires.ftc.teamcode.Systems.Software.SoftwareEnums;
 
-public enum DriveMode {
-    AUTOSCORE,
-    MANUALDRIVE,
-    ORIENT,
+public enum PropPosition {
+    LEFT,
+    MIDDLE,
+    RIGHT,
 }

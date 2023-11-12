@@ -12,6 +12,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.teamcode.Systems.Hardware.Subsystems.Drivetrain;
 import org.firstinspires.ftc.teamcode.Utilities.Vector;
+import org.firstinspires.ftc.teamcode.Systems.Software.SoftwareEnums.DriveMode;
 
 public class Robot {
 
@@ -36,6 +37,8 @@ public class Robot {
     private double rfPosition;
     private double rbPosition;
     private double lbPosition;
+    private double targetOrientation = 3 * (Math.PI/2) - 0.1;
+    public DriveMode driveMode = DriveMode.MANUALDRIVE;
 
     public Robot(LinearOpMode linearOpMode) {
         this.opMode = linearOpMode;
@@ -47,7 +50,7 @@ public class Robot {
      */
 
     public double getBotHeading() {
-        return -(imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS) - startAngle);
+        return -(imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS) - startAngle) % (2 * Math.PI);
     }
 
     /**
@@ -64,6 +67,10 @@ public class Robot {
         dropper.setPower(-1);
         opMode.sleep(1000);
         dropper.setPower(0);
+    }
+
+    public void setTargetOrientation(double angle) {
+        targetOrientation = angle % (2 * Math.PI);
     }
 
     /**
@@ -87,6 +94,7 @@ public class Robot {
         imu = opMode.hardwareMap.get(IMU.class,"imu");
         IMU.Parameters parameters = new IMU.Parameters(new RevHubOrientationOnRobot(RevHubOrientationOnRobot.LogoFacingDirection.UP,RevHubOrientationOnRobot.UsbFacingDirection.LEFT));
         imu.initialize(parameters);
+        imu.resetYaw();
 
         //getting the initial angle on the robot
         startAngle = imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS);
@@ -105,7 +113,7 @@ public class Robot {
         arm.setPower(1);
 
         //setting up the servos to be in the right position
-        wrist.setPosition(0.3);
+        wrist.setPosition(0.6);
         claw.setPower(0);
         launcher.setPosition(1);
         dropper.setPower(0);
@@ -139,6 +147,18 @@ public class Robot {
         lastRFPosition = rfPosition;
         lastRBPosition = rbPosition;
         lastLBPosition = lbPosition;
+
+        if (this.driveMode == DriveMode.ORIENT) {
+            if (Vector.dot( Vector.fromPolar(1,this.getBotHeading()) , Vector.fromPolar(1,targetOrientation) ) > 0.99) {
+                this.drivetrain.stop();
+            } else {
+                if (Math.sin(this.getBotHeading() - targetOrientation) > 0) {
+                    this.drivetrain.runDrivetrainFromCartesian(new Vector(0, 0), -0.5, this.getBotHeading());
+                } else {
+                    this.drivetrain.runDrivetrainFromCartesian(new Vector(0, 0), 0.5, this.getBotHeading());
+                }
+            }
+        }
     }
 
     /**
