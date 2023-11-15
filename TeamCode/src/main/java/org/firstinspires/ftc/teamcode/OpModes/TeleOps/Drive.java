@@ -82,67 +82,57 @@ public class Drive extends LinearOpMode {
             telemetry.addData("Orientation:",robot.getBotHeading());
 
             //running drive mode specific code
-            switch (robot.driveMode) {
-                case MANUALDRIVE:
+            if (robot.driveMode == DriveMode.MANUALDRIVE) {
 
-                    //Manual drive controls
+                //Manual drive controls
 
-                    //resets the gyroscope when button is clicked
-                    if (gamepad1.back) {
-                        robot.imu.resetYaw();
-                    }
+                //resets the gyroscope when button is clicked
+                if (gamepad1.back) {
+                    robot.imu.resetYaw();
+                }
 
-                    //setting variables to gamepad values
-                    x = gamepad1.left_stick_x;
-                    y = -gamepad1.left_stick_y;
-                    rx = gamepad1.right_stick_x;
+                //setting variables to gamepad values
+                x = gamepad1.left_stick_x;
+                y = -gamepad1.left_stick_y;
+                rx = gamepad1.right_stick_x;
 
-                    //setting the drivetrain speed as a function of input values
-                    robot.drivetrain.runDrivetrainFromCartesian(new Vector(x,y),rx,robot.getBotHeading());
+                //setting the drivetrain speed as a function of input values
+                robot.drivetrain.runDrivetrainFromCartesian(new Vector(x,y),rx,robot.getBotHeading());
 
-                    //setting arm to go up (-80 ticks) when the left bumper is pressed
-                    if (gamepad1.x) {
-                        robot.arm.setTargetPosition(-340);
-                        robot.arm.setPower(1);
-                    }
+                //setting arm to go up (-80 ticks) when the left bumper is pressed
+                if (gamepad1.x) {
+                    robot.arm.setTargetPosition(-340);
+                    robot.arm.setPower(1);
+                }
 
-                    //setting arm to go down (0 ticks) when the right bumper is pressed
-                    if (gamepad1.y) {
-                        robot.arm.setTargetPosition(-10);
-                        robot.arm.setPower(0.8);
-                    }
+                //setting arm to go down (0 ticks) when the right bumper is pressed
+                if (gamepad1.y) {
+                    robot.arm.setTargetPosition(-10);
+                    robot.arm.setPower(0.8);
+                }
 
-                    //setting the claw to move in, out, or neither depending on what combination of boolean inputs a and b give
-                    if (gamepad1.a == gamepad1.b) {
-                        robot.claw.setPower(0);
-                        robot.wrist.setPosition(0.6);
+                //setting the claw to move in, out, or neither depending on what combination of boolean inputs a and b give
+                if (gamepad1.a == gamepad1.b) {
+                    robot.claw.setPower(0);
+                    robot.wrist.setPosition(0.6);
+                } else {
+                    if (gamepad1.a) {
+                        robot.claw.setPower(1);
+                        robot.wrist.setPosition(0.4);
                     } else {
-                        if (gamepad1.a) {
-                            robot.claw.setPower(1);
-                            robot.wrist.setPosition(0.4);
-                        } else {
-                            robot.claw.setPower(-1);
-                            robot.wrist.setPosition(0.35);
-                        }
+                        robot.claw.setPower(-1);
+                        robot.wrist.setPosition(0.35);
                     }
+                }
 
-                    //launching the paper airplane when the guide button is clicked
-                    if (gamepad1.guide) {
-                        robot.launchDrone();
-                    }
+                //launching the paper airplane when the guide button is clicked
+                if (gamepad1.guide) {
+                    robot.launchDrone();
+                }
 
-                    if (gamepad1.left_trigger > 0 && gamepad1.right_trigger > 0) {
-                        robot.dropPixel();
-                    }
-
-                    break;
-
-                case AUTOSCORE:
-
-                    //Auto scoring
-
-
-                    break;
+                if (gamepad1.left_trigger > 0 && gamepad1.right_trigger > 0) {
+                    robot.dropPixel();
+                }
 
             }
 

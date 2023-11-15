@@ -5,6 +5,10 @@ public class Vector {
     public double x;
     public double y;
 
+    /**
+     * unit vector
+     * @return Vector equal to unit vector
+     */
     public Vector unit() {
         return new Vector(this.x * this.magnitude(),this.y * this.magnitude());
     }

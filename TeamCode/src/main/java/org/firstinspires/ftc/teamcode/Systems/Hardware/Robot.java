@@ -11,6 +11,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.teamcode.Systems.Hardware.Subsystems.Drivetrain;
+import org.firstinspires.ftc.teamcode.Systems.Software.SoftwareEnums.AutoScoringState;
 import org.firstinspires.ftc.teamcode.Utilities.Vector;
 import org.firstinspires.ftc.teamcode.Systems.Software.SoftwareEnums.DriveMode;
 
@@ -39,6 +40,7 @@ public class Robot {
     private double lbPosition;
     private double targetOrientation = 3 * (Math.PI/2) - 0.1;
     public DriveMode driveMode = DriveMode.MANUALDRIVE;
+    public AutoScoringState autoScoringState = AutoScoringState.ORIENT;
 
     public Robot(LinearOpMode linearOpMode) {
         this.opMode = linearOpMode;
@@ -129,6 +131,32 @@ public class Robot {
     }
 
     /**
+     * sets the robot's mode
+     * @param driveMode mode the robot will be set to
+     */
+    public void setDriveMode(DriveMode driveMode) {
+        this.driveMode = driveMode;
+        this.drivetrain.runDrivetrainFromCartesian(new Vector(0,0),0,this.getBotHeading());
+
+        switch (driveMode) {
+            case AUTOSCORE:
+                autoScoringState = AutoScoringState.ORIENT;
+                break;
+        }
+
+        this.update();
+
+    }
+
+    /**
+     * returns the robot's current drive mode
+     * @return current drive mode of the robot
+     */
+    public DriveMode getDriveMode() {
+        return this.driveMode;
+    }
+
+    /**
      * updates the coordinates of the robot
      */
     public void update() {
@@ -148,16 +176,22 @@ public class Robot {
         lastRBPosition = rbPosition;
         lastLBPosition = lbPosition;
 
-        if (this.driveMode == DriveMode.ORIENT) {
-            if (Vector.dot( Vector.fromPolar(1,this.getBotHeading()) , Vector.fromPolar(1,targetOrientation) ) > 0.99) {
-                this.drivetrain.stop();
-            } else {
-                if (Math.sin(this.getBotHeading() - targetOrientation) > 0) {
-                    this.drivetrain.runDrivetrainFromCartesian(new Vector(0, 0), -0.5, this.getBotHeading());
+        switch(this.driveMode) {
+
+            case ORIENT:
+                Vector orientationVector = Vector.fromPolar(1,this.getBotHeading());
+                Vector targetVector = Vector.fromPolar(1,targetOrientation);
+                if (Vector.dot( orientationVector , targetVector) > 0.99) {
+                    this.drivetrain.stop();
                 } else {
-                    this.drivetrain.runDrivetrainFromCartesian(new Vector(0, 0), 0.5, this.getBotHeading());
+                    if (Vector.cross( orientationVector , targetVector) > 0) {
+                        this.drivetrain.runDrivetrainFromCartesian(new Vector(0, 0), -0.5, this.getBotHeading());
+                    } else {
+                        this.drivetrain.runDrivetrainFromCartesian(new Vector(0, 0), 0.5, this.getBotHeading());
+                    }
                 }
-            }
+                break;
+
         }
     }
 
