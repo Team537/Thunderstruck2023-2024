@@ -30,13 +30,6 @@ public abstract class Auto extends LinearOpMode {
      * @param seconds time in seconds
      */
 
-    public void smartSleep(double seconds) {
-        runtime.reset();
-        while (opModeIsActive() && (runtime.seconds() < seconds)) {
-            robot.update();
-        }
-    }
-
     /**
      * runs auto from manual parameters
      * @param alliance robot's alliance color
@@ -44,7 +37,7 @@ public abstract class Auto extends LinearOpMode {
      * @param endPosition robot's parking position
      */
     public void runAutoFromParameters(Alliance alliance, StartPosition startPosition, EndPosition endPosition) {
-        runAuto(false, alliance, startPosition, endPosition);
+        runAuto(alliance, startPosition, endPosition);
     }
 
     /**
@@ -65,7 +58,7 @@ public abstract class Auto extends LinearOpMode {
 
             //Toggle alliance on rising edge of a button
             if (gamepad2.a) {
-                if (allianceState == false) {
+                if (!allianceState) {
                     switch (alliance) {
                         case RED:
                             alliance = BLUE;
@@ -82,7 +75,7 @@ public abstract class Auto extends LinearOpMode {
 
             //Toggle start position on rising edge of b button
             if (gamepad2.b) {
-                if (startPositionState == false) {
+                if (!startPositionState) {
                     switch (startPosition) {
                         case BACKSTAGE:
                             startPosition = FRONTSTAGE;
@@ -99,7 +92,7 @@ public abstract class Auto extends LinearOpMode {
 
             //Toggle end position on rising edge of x button
             if (gamepad2.x) {
-                if (endPositionState == false) {
+                if (!endPositionState) {
                     switch (endPosition) {
                         case CORNER:
                             endPosition = MIDDLE;
@@ -145,201 +138,211 @@ public abstract class Auto extends LinearOpMode {
 
         }
 
-        runAuto(false, alliance, startPosition, endPosition);
+        runAuto(alliance, startPosition, endPosition);
     }
 
     /**
-     * running the auto, except it will use parameters to determine what to do
+     * drives the robot in any direction for a certain amount of time before stopping
+     * @param linear the desired velocity vector
+     * @param seconds number of seconds the robot will drive
      */
-    public void runAutoFromSensors() {
-        waitForStart();
-        runAuto(true, Alliance.RED, FRONTSTAGE, CORNER);
+    public void linearDrive(Vector linear, double seconds) {
+        robot.setDriveMode(DriveMode.MANUALDRIVE);
+        robot.drivetrain.runDrivetrainFromCartesian(linear,0,robot.getBotHeading());
+        robot.smartSleep(seconds);
+        robot.drivetrain.stop();
+    }
+
+    /**
+     * orients the robot for a certain amount of time before stopping
+     * @param targetOrientation the orientation the robot will attempt to match
+     * @param seconds number of seconds the robot will spend attempting to orient itself
+     */
+    public void orient(double targetOrientation, double seconds) {
+        robot.setTargetOrientation(targetOrientation);
+        robot.setDriveMode(DriveMode.ORIENT);
+        robot.smartSleep(seconds);
+        robot.setDriveMode(DriveMode.MANUALDRIVE);
     }
 
     /**
      * runs the autonomous code
-     * @param useSensors whether or not the robot uses sensors to determine its position
      * @param alliance robot's alliance color
      * @param startPosition robot's starting position
      * @param endPosition robot's parking position
      */
-    public void runAuto(boolean useSensors, Alliance alliance, StartPosition startPosition, EndPosition endPosition) {
+    public void runAuto(Alliance alliance, StartPosition startPosition, EndPosition endPosition) {
 
         PropPosition propPosition;
-
         propPosition = PropPosition.MIDDLE;
+
+        int[] colorMatrix = {0,0,0};
 
         //attaching motor functions to robot object
         robot.initializeRobot();
 
         waitForStart();
 
-        //creates a simple way of inverting some of the x and rx values plugged into a motor matrix. This is because these values are usually negated when switching alliance
-        //if you want a value negated when the alliance color is blue, simply multiply it by "allianceInvert"
-        double allianceInvert;
-        if (alliance == Alliance.RED) {
-            allianceInvert = 1;
-        } else {
-            allianceInvert = -1;
-        }
-
-        waitForStart();
-
         //Drive forward to center of spike marks
-        smartSleep(1);
-        robot.drivetrain.runDrivetrainFromCartesian(new Vector(0,0.5), 0, robot.getBotHeading());
-        smartSleep(2.1);
-        robot.drivetrain.stop();
-        smartSleep(1);
+        linearDrive(new Vector(0,0.5),2.1);
 
         //Rotate so robot is facing away from left spike mark
-        robot.setTargetOrientation( 0 );
-        robot.setDriveMode(DriveMode.ORIENT);
-        smartSleep(0.9); //0.9
-        robot.setDriveMode(DriveMode.MANUALDRIVE);
-        robot.drivetrain.stop();
-        smartSleep(0.5);
+        orient(0,0.9);
+        robot.smartSleep(0.5);
 
-        //detect prop
+        //detect the prop at the first position (searches for different color depending on alliance)
+        if (alliance == Alliance.RED) {
+            colorMatrix[0] = robot.colorSensor.red();
+        } else {
+            colorMatrix[0] = robot.colorSensor.blue();
+        }
 
         //Rotate so robot is facing away from middle spike mark
-        robot.setTargetOrientation( 3 * (Math.PI/2) );
-        robot.setDriveMode(DriveMode.ORIENT);
-        smartSleep(0.9); //0.9
-        robot.setDriveMode(DriveMode.MANUALDRIVE);
-        robot.drivetrain.stop();
-        smartSleep(0.5);
+        orient(1.5 * Math.PI,0.9);
 
-        //detect prop
+        //detect the prop at the second position (searches for different color depending on alliance)
+        if (alliance == Alliance.RED) {
+            colorMatrix[1] = robot.colorSensor.red();
+        } else {
+            colorMatrix[1] = robot.colorSensor.blue();
+        }
 
         //Rotate so robot is facing away from right spike mark
-        robot.setTargetOrientation( Math.PI );
-        robot.setDriveMode(DriveMode.ORIENT);
-        smartSleep(0.9); //0.9
-        robot.setDriveMode(DriveMode.MANUALDRIVE);
-        smartSleep(0.5);
+        orient(Math.PI,0.9);
 
-        //detect prop
+        //detect the prop at the third position (searches for different color depending on alliance)
+        if (alliance == Alliance.RED) {
+            colorMatrix[1] = robot.colorSensor.red();
+        } else {
+            colorMatrix[1] = robot.colorSensor.blue();
+        }
+
+        if (colorMatrix[0] >= colorMatrix[1] && colorMatrix[0] >= colorMatrix[2]) {
+            propPosition = PropPosition.LEFT;
+        }
+        if (colorMatrix[1] >= colorMatrix[2] && colorMatrix[1] >= colorMatrix[0]) {
+            propPosition = PropPosition.MIDDLE;
+        }
+        if (colorMatrix[2] >= colorMatrix[0] && colorMatrix[2] >= colorMatrix[1]) {
+            propPosition = PropPosition.RIGHT;
+        }
 
         //score differently depending on where the prop was detected
         switch (propPosition) {
             case LEFT:
 
                 //drop pixel on left spike mark
-                robot.setTargetOrientation( 3 * (Math.PI/2) );
-                robot.setDriveMode(DriveMode.ORIENT);
-                smartSleep(0.9); //0.9
-                robot.setDriveMode(DriveMode.MANUALDRIVE);
-                robot.drivetrain.runDrivetrainFromCartesian(new Vector(-0.5,0), 0, robot.getBotHeading());
-                smartSleep(0.9);
-                robot.drivetrain.stop();
-                smartSleep(0.3);
+                orient(1.5 * Math.PI,0.9);
+                linearDrive(new Vector(-0.5,0),0.9);
                 robot.dropPixel();
-                smartSleep(0.3);
+
+                //dislodge pixel (may be stuck)
+                linearDrive(new Vector(0,0.5),0.3);
+                linearDrive(new Vector(0,-0.5),0.3);
 
                 //drive back to center
-                robot.drivetrain.runDrivetrainFromCartesian(new Vector(0.5,0),0,robot.getBotHeading());
-                smartSleep(0.9);
-                robot.setTargetOrientation( 0 );
-                robot.setDriveMode(DriveMode.ORIENT);
-                smartSleep(0.9); //0.9
-                robot.setDriveMode(DriveMode.MANUALDRIVE);
-                robot.drivetrain.stop();
+                linearDrive(new Vector(0.5,0),0.9);
+                orient((alliance == Alliance.RED) ? Math.PI:0,0.9);
 
                 break;
 
             case MIDDLE:
 
                 //drop pixel on center spike mark
-                smartSleep(0.9);
-                robot.drivetrain.runDrivetrainFromCartesian(new Vector(0,0.5), 0, robot.getBotHeading());
-                smartSleep(0.9);
-                robot.drivetrain.stop();
-                smartSleep(0.3);
+                linearDrive(new Vector(0,0.5),0.9);
                 robot.dropPixel();
-                smartSleep(0.3);
+
+                //dislodge pixel (may be stuck)
+                linearDrive(new Vector(0.5,0),0.3);
+                linearDrive(new Vector(-0.5,0),0.3);
 
                 //drive back to center
-                robot.drivetrain.runDrivetrainFromCartesian(new Vector(0,-0.5),0,robot.getBotHeading());
-                smartSleep(0.9);
-                robot.setTargetOrientation( 0 );
-                robot.setDriveMode(DriveMode.ORIENT);
-                smartSleep(0.9); //0.9
-                robot.setDriveMode(DriveMode.MANUALDRIVE);
-                robot.drivetrain.stop();
+                linearDrive(new Vector(0,-0.5),0.9);
+                orient((alliance == Alliance.RED) ? Math.PI:0,0.9);
                 break;
 
             case RIGHT:
 
                 //drop pixel on right spike mark
-                robot.setTargetOrientation( Math.PI/2 );
-                robot.setDriveMode(DriveMode.ORIENT);
-                smartSleep(0.9); //0.9
-                robot.setDriveMode(DriveMode.MANUALDRIVE);
-                robot.drivetrain.runDrivetrainFromCartesian(new Vector(0.5,0), 0, robot.getBotHeading());
-                smartSleep(0.9);
-                robot.drivetrain.stop();
-                smartSleep(0.3);
+                orient(0.5 * Math.PI,0.9);
+                linearDrive(new Vector(0.5,0),0.9);
                 robot.dropPixel();
-                smartSleep(0.3);
+
+                //dislodge pixel (may be stuck)
+                linearDrive(new Vector(0,-0.5),0.3);
+                linearDrive(new Vector(0,0.5),0.3);
 
                 //drive back to center
-                robot.drivetrain.runDrivetrainFromCartesian(new Vector(-0.5,0),0,robot.getBotHeading());
-                smartSleep(0.9);
-                robot.setTargetOrientation( 0 );
-                robot.setDriveMode(DriveMode.ORIENT);
-                smartSleep(0.9); //0.9
-                robot.setDriveMode(DriveMode.MANUALDRIVE);
-                robot.drivetrain.stop();
+                linearDrive(new Vector(-0.5,0),0.9);
+                orient((alliance == Alliance.RED) ? Math.PI:0,0.9);
                 break;
         }
 
-        //makes robot raise arm and drive towards board
+        //drives to the board (different depending on start position)
+        switch (startPosition) {
+            case BACKSTAGE:
+                linearDrive(new Vector((alliance == Alliance.RED) ? 0.5:-0.5, 0),2.5);
+                break;
+            case FRONTSTAGE:
+                linearDrive(new Vector(0, -0.5),2);
+                linearDrive(new Vector((alliance == Alliance.RED) ? 0.5:-0.5, 0),5);
+                linearDrive(new Vector(0, 0.5),2);
+                break;
+        }
+
+        //makes robot raise arm
         robot.arm.armUp();
-        robot.drivetrain.runDrivetrainFromCartesian(new Vector(-0.5, 0),0, robot.getBotHeading());
-        smartSleep(2.5);
-        robot.drivetrain.stop();
+        robot.smartSleep(2);
 
         //moves drivetrain to right position for scoring
         switch (propPosition) {
 
             case LEFT:
-                robot.drivetrain.runDrivetrainFromCartesian(new Vector(0, -0.5),0, robot.getBotHeading());
-                smartSleep(0.3);
-                robot.drivetrain.stop();
+                linearDrive(new Vector(0,-0.5),0.3);
                 break;
 
             case RIGHT:
-                robot.drivetrain.runDrivetrainFromCartesian(new Vector(0,0.5), 0, robot.getBotHeading());
-                smartSleep(0.3);
-                robot.drivetrain.stop();
+                linearDrive(new Vector(0,0.5),0.3);
                 break;
 
         }
 
         //drops pre-loaded pixel and lowers arm
         robot.arm.discharge();
-        smartSleep(1);
+        robot.smartSleep(1);
         robot.arm.stopClaw();
         robot.arm.armDown();
-
+        robot.smartSleep(2);
 
         //re-centers robot
         switch (propPosition) {
 
             case LEFT:
-                robot.drivetrain.runDrivetrainFromCartesian(new Vector (0,0.5), 0, robot.getBotHeading());
-                smartSleep(0.3);
-                robot.drivetrain.stop();
+                linearDrive(new Vector(0,0.5),0.3);
                 break;
-
 
             case RIGHT:
-                robot.drivetrain.runDrivetrainFromCartesian(new Vector (0,-0.5), 0, robot.getBotHeading());
-                smartSleep(0.3);
-                robot.drivetrain.stop();
+                linearDrive(new Vector(0,-0.5),0.3);
+                break;
+
+        }
+
+        //orients so field centric is correct upon TeleOp
+        orient(0.5 * Math.PI,0.9);
+
+        //splits depending on target end position
+        switch (endPosition) {
+            case CORNER:
+                linearDrive(new Vector(0,-0.5),2);
+                break;
+            case MIDDLE:
+                linearDrive(new Vector(0,0.5),1.8);
                 break;
         }
+
+        //drives into corner and reorients servo
+        linearDrive(new Vector((alliance == Alliance.RED) ? 0.5:-0.5,0),1);
+        robot.arm.wrist.setPosition(0.5);
 
     }
 

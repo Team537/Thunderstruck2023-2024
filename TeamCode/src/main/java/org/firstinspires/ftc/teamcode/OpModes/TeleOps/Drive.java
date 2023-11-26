@@ -4,11 +4,11 @@ package org.firstinspires.ftc.teamcode.OpModes.TeleOps;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
-import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.teamcode.Systems.Software.SoftwareEnums.Alliance;
 import org.firstinspires.ftc.teamcode.Systems.Software.SoftwareEnums.DriveMode;
 import org.firstinspires.ftc.teamcode.Systems.Hardware.Robot;
 import org.firstinspires.ftc.teamcode.Systems.Software.SoftwareEnums.DriveSpeed;
+import org.firstinspires.ftc.teamcode.Systems.Software.SoftwareEnums.FieldOfReference;
 import org.firstinspires.ftc.teamcode.Systems.Software.SoftwareEnums.ScoringPosition;
 import org.firstinspires.ftc.teamcode.Utilities.Vector;
 
@@ -22,16 +22,10 @@ public class Drive extends LinearOpMode {
     double rx = 0;
 
     DriveMode driveModeSetting = DriveMode.MANUALDRIVE;
-
     boolean driveModeSettingToggle = false;
-
-    Alliance alliance = Alliance.RED;
-
     boolean allianceToggle = false;
-
-    ScoringPosition scoringPosition = ScoringPosition.CENTER;
-
     boolean scoringPositionToggle = false;
+    boolean fieldOfReferenceToggle = false;
 
     //creating a robot object, every input (ex. reading a sensor value) and output (ex. running a motor) is run through this class
     Robot robot = new Robot(this);
@@ -44,13 +38,13 @@ public class Drive extends LinearOpMode {
 
             //Toggle alliance on rising edge of a button
             if (gamepad2.a) {
-                if (allianceToggle == false) {
-                    switch (alliance) {
+                if (!allianceToggle) {
+                    switch (robot.alliance) {
                         case RED:
-                            alliance = Alliance.BLUE;
+                            robot.alliance = Alliance.BLUE;
                             break;
                         case BLUE:
-                            alliance = Alliance.RED;
+                            robot.alliance = Alliance.RED;
                             break;
                     }
                 }
@@ -60,7 +54,7 @@ public class Drive extends LinearOpMode {
             }
 
             //displaying alliance settings
-            switch (alliance) {
+            switch (robot.alliance) {
                 case RED:
                     telemetry.addData("Alliance:","RED");
                     break;
@@ -87,18 +81,13 @@ public class Drive extends LinearOpMode {
 
                 //Manual drive controls
 
-                //resets the gyroscope when button is clicked
-                if (gamepad1.back) {
-                    robot.imu.resetYaw();
-                }
-
                 //setting variables to gamepad values
                 x = gamepad1.left_stick_x;
                 y = -gamepad1.left_stick_y;
                 rx = gamepad1.right_stick_x;
 
                 //setting the drivetrain speed as a function of input values
-                robot.drivetrain.runDrivetrainFromCartesian(new Vector(x,y),rx,robot.getBotHeading());
+                robot.drivetrain.runDrivetrainFromCartesian(new Vector(x,y),-rx, (robot.fieldOfReference == FieldOfReference.FIELD_CENTRIC) ? robot.getBotHeading() : 0.5 * Math.PI );
 
                 //setting arm to go up when the left bumper is pressed
                 if (gamepad1.x) {
@@ -139,7 +128,7 @@ public class Drive extends LinearOpMode {
 
             }
 
-            //running error correct specifc code
+            //running error correct specific code
             if (robot.driveMode == DriveMode.ERRORCORRECT) {
 
                 //resets yaw when guide button is clicked
@@ -149,57 +138,62 @@ public class Drive extends LinearOpMode {
 
                 //manual changes to arm heights
                 if (gamepad1.a) {
-                    robot.arm.armDownPosition =+ 1;
+                    robot.arm.armDownPosition += 1;
                 }
                 if (gamepad1.b) {
-                    robot.arm.armDownPosition =- 1;
+                    robot.arm.armDownPosition -= 1;
                 }
                 if (gamepad1.y) {
-                    robot.arm.armUpPosition =+ 1;
+                    robot.arm.armUpPosition += 1;
                 }
                 if (gamepad1.x) {
-                    robot.arm.armDownPosition =- 1;
+                    robot.arm.armDownPosition -= 1;
                 }
 
                 //manual changes to wrist orientations
                 if (gamepad1.right_bumper) {
-                    robot.arm.wristActivePosition =+ 0.01;
+                    robot.arm.wristActivePosition += 0.01;
                 }
                 if (gamepad1.left_bumper) {
-                    robot.arm.wristActivePosition =- 0.01;
+                    robot.arm.wristActivePosition -= 0.01;
                 }
                 if (gamepad1.right_trigger > 0) {
-                    robot.arm.wristNeutralPosition =+ 0.01;
+                    robot.arm.wristNeutralPosition += 0.01;
                 }
                 if (gamepad1.left_trigger > 0) {
-                    robot.arm.wristNeutralPosition =- 0.01;
+                    robot.arm.wristNeutralPosition -= 0.01;
                 }
 
                 //manual changes to drive speed
                 if (gamepad1.dpad_up) {
-                    robot.drivetrain.standardDriveSpeed =+ 0.01;
+                    robot.drivetrain.standardDriveSpeed += 0.01;
                 }
                 if (gamepad1.dpad_down) {
-                    robot.drivetrain.standardDriveSpeed =- 0.01;
+                    robot.drivetrain.standardDriveSpeed -= 0.01;
                 }
                 if (gamepad1.dpad_right) {
-                    robot.drivetrain.preciseDriveSpeed =+ 0.01;
+                    robot.drivetrain.preciseDriveSpeed += 0.01;
                 }
                 if (gamepad1.dpad_left) {
-                    robot.drivetrain.preciseDriveSpeed =- 0.01;
+                    robot.drivetrain.preciseDriveSpeed -= 0.01;
                 }
 
             }
 
+            //stop robot upon emergency brake
+            if (gamepad2.left_trigger > 0 && gamepad2.right_trigger > 0) {
+                robot.setDriveMode(DriveMode.EMERGENCYBRAKE);
+            }
+
             //Toggle alliance on rising edge of a button
             if (gamepad2.a) {
-                if (allianceToggle == false) {
-                    switch (alliance) {
+                if (!allianceToggle) {
+                    switch (robot.alliance) {
                         case RED:
-                            alliance = Alliance.BLUE;
+                            robot.alliance = Alliance.BLUE;
                             break;
                         case BLUE:
-                            alliance = Alliance.RED;
+                            robot.alliance = Alliance.RED;
                             break;
                     }
                 }
@@ -210,16 +204,16 @@ public class Drive extends LinearOpMode {
 
             //Toggle scoring position on rising edge of a button
             if (gamepad2.b) {
-                if (scoringPositionToggle == false) {
-                    switch (scoringPosition) {
+                if (!scoringPositionToggle) {
+                    switch (robot.scoringPosition) {
                         case LEFT:
-                            scoringPosition = ScoringPosition.CENTER;
+                            robot.scoringPosition = ScoringPosition.CENTER;
                             break;
                         case CENTER:
-                            scoringPosition = ScoringPosition.RIGHT;
+                            robot.scoringPosition = ScoringPosition.RIGHT;
                             break;
                         case RIGHT:
-                            scoringPosition = ScoringPosition.LEFT;
+                            robot.scoringPosition = ScoringPosition.LEFT;
                             break;
                     }
                 }
@@ -228,8 +222,24 @@ public class Drive extends LinearOpMode {
                 scoringPositionToggle = false;
             }
 
+            if (gamepad2.y) {
+                if (!fieldOfReferenceToggle) {
+                    switch (robot.fieldOfReference) {
+                        case FIELD_CENTRIC:
+                            robot.fieldOfReference = FieldOfReference.ROBOT_CENTRIC;
+                            break;
+                        case ROBOT_CENTRIC:
+                            robot.fieldOfReference = FieldOfReference.FIELD_CENTRIC;
+                            break;
+                    }
+                }
+                fieldOfReferenceToggle = true;
+            } else {
+                fieldOfReferenceToggle = false;
+            }
+
             if (gamepad2.x) {
-                if (driveModeSettingToggle == false) {
+                if (!driveModeSettingToggle) {
                     switch (driveModeSetting) {
                         case MANUALDRIVE:
                             driveModeSetting = DriveMode.AUTOSCORE;
@@ -252,8 +262,8 @@ public class Drive extends LinearOpMode {
                 robot.driveMode = driveModeSetting;
             }
 
-            //displaying alliance settings
-            switch (alliance) {
+            //Displays Alliance
+            switch (robot.alliance) {
                 case RED:
                     telemetry.addData("Alliance:","RED");
                     break;
@@ -261,7 +271,8 @@ public class Drive extends LinearOpMode {
                     telemetry.addData("Alliance:","BLUE");
             }
 
-            switch (scoringPosition) {
+            //Displays Scoring Position
+            switch (robot.scoringPosition) {
                 case LEFT:
                     telemetry.addData("Scoring Position:","LEFT");
                     break;
@@ -273,6 +284,17 @@ public class Drive extends LinearOpMode {
                     break;
             }
 
+            //Displays Scoring Position
+            switch (robot.fieldOfReference) {
+                case FIELD_CENTRIC:
+                    telemetry.addData("Field Of Reference:","FIELD CENTRIC");
+                    break;
+                case ROBOT_CENTRIC:
+                    telemetry.addData("Field Of Reference:","ROBOT CENTRIC");
+                    break;
+            }
+
+            //Displays Drive Mode Setting
             switch (driveModeSetting) {
                 case MANUALDRIVE:
                     telemetry.addData("Drive Mode Setting:","Manual Drive");
@@ -285,6 +307,7 @@ public class Drive extends LinearOpMode {
                     break;
             }
 
+            //Displays Committed Drive Mode
             switch (robot.driveMode) {
                 case MANUALDRIVE:
                     telemetry.addData("Committed Drive Mode:","Manual Drive");
@@ -294,6 +317,9 @@ public class Drive extends LinearOpMode {
                     break;
                 case ERRORCORRECT:
                     telemetry.addData("Committed Drive Mode:","Error Correct");
+                    break;
+                case EMERGENCYBRAKE:
+                    telemetry.addData("Committed Drive Mode:","Emergency Brake");
                     break;
             }
 

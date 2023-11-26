@@ -35,12 +35,12 @@ public class MotorMatrix {
 
         //reducing <x,y> to a unit vector if its magnitude exceeds 1
         //this is important because quick joystick rotations can result in unpredictable values and the robot not turning in a correct direction
-        Vector condensedLinear;
+        Vector clampedLinear;
 
         if (linear.magnitude() > 1) {
-            condensedLinear = linear.unit();
+            clampedLinear = linear.unit();
         } else {
-            condensedLinear = linear;
+            clampedLinear = linear;
         }
 
         //clamping rx to the domain [-1,1]
@@ -50,11 +50,11 @@ public class MotorMatrix {
 
         //revolving x and y around the origin with -botHeading degrees angles. This makes the code field centric
 
-        Vector rotatedLinear = Vector.rotate(condensedLinear,botHeading);
+        Vector rotatedLinear = Vector.rotate(clampedLinear,botHeading);
 
         //calculating the values used for linear velocity of the motors
-        double cosineMove = (rotatedLinear.y + rotatedLinear.x)/Math.sqrt(2);
-        double sineMove = (rotatedLinear.y - rotatedLinear.x)/Math.sqrt(2);
+        double cosineMove = (rotatedLinear.x - rotatedLinear.y)/Math.sqrt(2);
+        double sineMove = (rotatedLinear.x + rotatedLinear.y)/Math.sqrt(2);
 
         double cosinePivot;
         double sinePivot;
@@ -77,10 +77,10 @@ public class MotorMatrix {
         }
 
         //adding or subtracting the desired linear velocities which will give constant values when added together
-        lf = (cosineMove + cosinePivot) * multiplier;
-        rf = (sineMove - sinePivot) * multiplier;
-        rb = (cosineMove - cosinePivot) * multiplier;
-        lb = (sineMove + sinePivot) * multiplier;
+        lf = (cosineMove - cosinePivot) * multiplier;
+        rf = (sineMove + sinePivot) * multiplier;
+        rb = (cosineMove + cosinePivot) * multiplier;
+        lb = (sineMove - sinePivot) * multiplier;
 
     }
 

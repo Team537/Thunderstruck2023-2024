@@ -8,26 +8,32 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.IMU;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.teamcode.Systems.Hardware.Subsystems.Arm;
 import org.firstinspires.ftc.teamcode.Systems.Hardware.Subsystems.Drivetrain;
+import org.firstinspires.ftc.teamcode.Systems.Software.SoftwareEnums.Alliance;
 import org.firstinspires.ftc.teamcode.Systems.Software.SoftwareEnums.AutoScoringState;
+import org.firstinspires.ftc.teamcode.Systems.Software.SoftwareEnums.FieldOfReference;
+import org.firstinspires.ftc.teamcode.Systems.Software.SoftwareEnums.ScoringPosition;
 import org.firstinspires.ftc.teamcode.Utilities.Vector;
 import org.firstinspires.ftc.teamcode.Systems.Software.SoftwareEnums.DriveMode;
 
 public class Robot {
 
     //defining attributes which will be used in the code (sensors, motors, and other variables)
+    private LinearOpMode opMode;
+
     public Drivetrain drivetrain = new Drivetrain();
     public IMU imu;
     public Arm arm = new Arm();
     public Servo launcher;
     public CRServo dropper;
     public ColorSensor colorSensor;
-    public final double TICKS_PER_INCH = 57.953;
+
     public double angleOffset;
-    private LinearOpMode opMode;
+
     private Vector position = new Vector(0,0);
     private double lastLFPosition;
     private double lastRFPosition;
@@ -37,19 +43,37 @@ public class Robot {
     private double rfPosition;
     private double rbPosition;
     private double lbPosition;
-    private double targetOrientation = 3 * (Math.PI/2) - 0.1;
+
+    private double targetOrientation = 0.5 * Math.PI;
+
     public DriveMode driveMode = DriveMode.MANUALDRIVE;
     public AutoScoringState autoScoringState = AutoScoringState.ORIENT;
+    public Alliance alliance = Alliance.RED;
+    public ScoringPosition scoringPosition = ScoringPosition.CENTER;
+    public FieldOfReference fieldOfReference = FieldOfReference.FIELD_CENTRIC;
 
+    public final double TICKS_PER_INCH = 57.953;
+
+    ElapsedTime runtime = new ElapsedTime();
     public Robot(LinearOpMode linearOpMode) {
         this.opMode = linearOpMode;
+    }
+
+    /**
+     * sleeps for a number seconds using the robots internal clock
+     * @param seconds time in seconds
+     */
+    public void smartSleep(double seconds) {
+        runtime.reset();
+        while (opMode.opModeIsActive() && (runtime.seconds() < seconds)) {
+            this.update();
+        }
     }
 
     /**
      * returns the bot heading of the robot
      * @return bot heading of the robot in radians
      */
-
     public double getBotHeading() {
         return (-imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS) + angleOffset) % (2 * Math.PI);
     }
@@ -66,7 +90,7 @@ public class Robot {
      */
     public void dropPixel() {
         dropper.setPower(-1);
-        opMode.sleep(1000);
+        this.smartSleep(1);
         dropper.setPower(0);
     }
 
@@ -86,9 +110,9 @@ public class Robot {
         drivetrain.rbMotor = opMode.hardwareMap.get(DcMotor.class, "rb_motor");
 
         //configuring motors so they move in the right direction
-        drivetrain.lfMotor.setDirection(DcMotorSimple.Direction.FORWARD);
+        drivetrain.lfMotor.setDirection(DcMotorSimple.Direction.REVERSE);
         drivetrain.rfMotor.setDirection(DcMotorSimple.Direction.FORWARD);
-        drivetrain.lbMotor.setDirection(DcMotorSimple.Direction.FORWARD);
+        drivetrain.lbMotor.setDirection(DcMotorSimple.Direction.REVERSE);
         drivetrain.rbMotor.setDirection(DcMotorSimple.Direction.FORWARD);
 
         //attaching imu to variable and getting the gyroscope set up
@@ -98,7 +122,7 @@ public class Robot {
         imu.resetYaw();
 
         //getting the initial angle on the robot
-        angleOffset = Math.PI/2;
+        angleOffset = 0.5 * Math.PI;
 
         //attaching arm/launcher motors and servos
         arm.shoulder = opMode.hardwareMap.get(DcMotor.class, "arm");
@@ -108,7 +132,6 @@ public class Robot {
         dropper = opMode.hardwareMap.get(CRServo.class,"dropper");
 
         //configuring the arm so it is in the right mode at the right power
-        arm.shoulder.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         arm.shoulder.setTargetPosition(0);
         arm.shoulder.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         arm.shoulder .setPower(1);
@@ -127,7 +150,7 @@ public class Robot {
         lastRBPosition = drivetrain.rbMotor.getCurrentPosition();
         lastLBPosition = drivetrain.lbMotor.getCurrentPosition();
 
-    }
+    } //end method initialize()
 
     /**
      * sets the robot's mode
@@ -135,17 +158,25 @@ public class Robot {
      */
     public void setDriveMode(DriveMode driveMode) {
         this.driveMode = driveMode;
-        this.drivetrain.runDrivetrainFromCartesian(new Vector(0,0),0,this.getBotHeading());
+        this.drivetrain.stop();
 
         switch (driveMode) {
             case AUTOSCORE:
                 autoScoringState = AutoScoringState.ORIENT;
                 break;
+            case MANUALDRIVE:
+                //in case the power was changed via emergency brake, set power back on for the shoulder
+                this.arm.shoulder.setPower(1);
+                this.drivetrain.lfMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+                this.drivetrain.rfMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+                this.drivetrain.rbMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+                this.drivetrain.lbMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+                break;
         }
 
         this.update();
 
-    }
+    } //end method setDriveMode()
 
     /**
      * returns the robot's current drive mode
@@ -163,11 +194,11 @@ public class Robot {
         rfPosition = drivetrain.rfMotor.getCurrentPosition();
         rbPosition = drivetrain.rbMotor.getCurrentPosition();
         lbPosition = drivetrain.lbMotor.getCurrentPosition();
-        double angle = -this.getBotHeading();
-        Vector lfVector = Vector.rotate( Vector.multiply( new Vector(Math.sqrt(2) / 2, Math.sqrt(2) / 2), lfPosition - lastLFPosition ), angle);
-        Vector rfVector = Vector.rotate( Vector.multiply( new Vector(-Math.sqrt(2) / 2, Math.sqrt(2) / 2), rfPosition - lastRFPosition ), angle);
-        Vector rbVector = Vector.rotate( Vector.multiply( new Vector(Math.sqrt(2) / 2, Math.sqrt(2) / 2), rbPosition - lastRBPosition ), angle);
-        Vector lbVector = Vector.rotate( Vector.multiply( new Vector(-Math.sqrt(2) / 2, Math.sqrt(2) / 2), lbPosition - lastLBPosition ), angle);
+        double angle = this.getBotHeading();
+        Vector lfVector = Vector.rotate( Vector.multiply( new Vector(Math.sqrt(2) / 2, -Math.sqrt(2) / 2), lfPosition - lastLFPosition ), angle);
+        Vector rfVector = Vector.rotate( Vector.multiply( new Vector(Math.sqrt(2) / 2, Math.sqrt(2) / 2), rfPosition - lastRFPosition ), angle);
+        Vector rbVector = Vector.rotate( Vector.multiply( new Vector(Math.sqrt(2) / 2, -Math.sqrt(2) / 2), rbPosition - lastRBPosition ), angle);
+        Vector lbVector = Vector.rotate( Vector.multiply( new Vector(Math.sqrt(2) / 2, Math.sqrt(2) / 2), lbPosition - lastLBPosition ), angle);
         Vector totalVector = Vector.add( Vector.add(lfVector,rfVector), Vector.add(rbVector,lbVector) );
         position = Vector.add(position,totalVector);
         lastLFPosition = lfPosition;
@@ -180,19 +211,29 @@ public class Robot {
             case ORIENT:
                 Vector orientationVector = Vector.fromPolar(1,this.getBotHeading());
                 Vector targetVector = Vector.fromPolar(1,targetOrientation);
-                if (Vector.dot( orientationVector , targetVector) > 0.99) {
-                    this.drivetrain.stop();
+                if (Vector.dot(orientationVector,targetVector) > 0) {
+                    this.drivetrain.runDrivetrainFromCartesian(new Vector(0, 0), Vector.cross(orientationVector, targetVector), this.getBotHeading());
                 } else {
-                    if (Vector.cross( orientationVector , targetVector) > 0) {
-                        this.drivetrain.runDrivetrainFromCartesian(new Vector(0, 0), -0.5, this.getBotHeading());
+                    if (Vector.cross(orientationVector, targetVector) > 0) {
+                        this.drivetrain.runDrivetrainFromCartesian(new Vector(0, 0), 1, this.getBotHeading());
                     } else {
-                        this.drivetrain.runDrivetrainFromCartesian(new Vector(0, 0), 0.5, this.getBotHeading());
+                        this.drivetrain.runDrivetrainFromCartesian(new Vector(0, 0), -1, this.getBotHeading());
                     }
                 }
                 break;
 
+            case EMERGENCYBRAKE:
+                this.drivetrain.lfMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+                this.drivetrain.rfMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+                this.drivetrain.rbMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+                this.drivetrain.lbMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+                this.drivetrain.stop();
+                this.arm.shoulder.setPower(0);
+                this.arm.claw.setPower(0);
+                this.dropper.setPower(0);
+                break;
         }
-    }
+    } //end method update()
 
     /**
      * gets the position of the robot

@@ -5,4 +5,5 @@ public enum DriveMode {
     MANUALDRIVE,
     ORIENT,
     ERRORCORRECT,
+    EMERGENCYBRAKE,
 }
