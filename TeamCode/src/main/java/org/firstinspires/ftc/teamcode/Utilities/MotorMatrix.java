@@ -29,8 +29,9 @@ public class MotorMatrix {
      * @param linear the linear velocity vector
      * @param rx the magnitude of the rotational vector
      * @param botHeading the orientation of the robot (in radians)
+     * @param multiplier a scalar all motor speeds will be multiplied by
      */
-    public void setMotorMatrixFromCartesian(Vector linear, double rx, double botHeading) {
+    public void setMotorMatrixFromCartesian(Vector linear, double rx, double botHeading, double multiplier) {
 
         //reducing <x,y> to a unit vector if its magnitude exceeds 1
         //this is important because quick joystick rotations can result in unpredictable values and the robot not turning in a correct direction
@@ -76,10 +77,10 @@ public class MotorMatrix {
         }
 
         //adding or subtracting the desired linear velocities which will give constant values when added together
-        lf = cosineMove + cosinePivot;
-        rf = sineMove - sinePivot;
-        rb = cosineMove - cosinePivot;
-        lb = sineMove + sinePivot;
+        lf = (cosineMove + cosinePivot) * multiplier;
+        rf = (sineMove - sinePivot) * multiplier;
+        rb = (cosineMove - cosinePivot) * multiplier;
+        lb = (sineMove + sinePivot) * multiplier;
 
     }
 

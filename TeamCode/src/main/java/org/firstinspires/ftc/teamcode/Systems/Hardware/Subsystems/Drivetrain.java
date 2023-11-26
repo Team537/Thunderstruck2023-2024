@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.Systems.Hardware.Subsystems;
 
 import com.qualcomm.robotcore.hardware.DcMotor;
 
+import org.firstinspires.ftc.teamcode.Systems.Software.SoftwareEnums.DriveSpeed;
 import org.firstinspires.ftc.teamcode.Utilities.MotorMatrix;
 import org.firstinspires.ftc.teamcode.Utilities.Vector;
 
@@ -12,6 +13,24 @@ public class Drivetrain {
     public DcMotor rfMotor;
     public DcMotor rbMotor;
     public DcMotor lbMotor;
+
+    private final double DEFAULT_STANDARD_DRIVE_SPEED = 1;
+    private final double DEFAULT_PRECISE_DRIVE_SPEED = 0.3;
+    public double standardDriveSpeed = DEFAULT_STANDARD_DRIVE_SPEED;
+    public double preciseDriveSpeed = DEFAULT_PRECISE_DRIVE_SPEED;
+
+    public double speed;
+
+    public void setDriveSpeed(DriveSpeed driveSpeed) {
+        switch (driveSpeed) {
+            case STANDARD:
+                speed = standardDriveSpeed;
+                break;
+            case PRECISE:
+                speed = preciseDriveSpeed;
+                break;
+        }
+    }
 
     /**
      * runs drivetrain with a MotorMatrix parameter
@@ -32,7 +51,7 @@ public class Drivetrain {
      */
     public void runDrivetrainFromCartesian(Vector linear, double rx, double botHeading) {
         MotorMatrix motorMatrix = new MotorMatrix();
-        motorMatrix.setMotorMatrixFromCartesian(linear,rx,botHeading);
+        motorMatrix.setMotorMatrixFromCartesian(linear,rx,botHeading,speed);
         lfMotor.setPower(motorMatrix.lf);
         rfMotor.setPower(motorMatrix.rf);
         lbMotor.setPower(motorMatrix.lb);

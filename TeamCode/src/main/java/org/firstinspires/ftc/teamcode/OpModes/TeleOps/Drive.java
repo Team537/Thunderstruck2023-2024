@@ -8,6 +8,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.teamcode.Systems.Software.SoftwareEnums.Alliance;
 import org.firstinspires.ftc.teamcode.Systems.Software.SoftwareEnums.DriveMode;
 import org.firstinspires.ftc.teamcode.Systems.Hardware.Robot;
+import org.firstinspires.ftc.teamcode.Systems.Software.SoftwareEnums.DriveSpeed;
 import org.firstinspires.ftc.teamcode.Systems.Software.SoftwareEnums.ScoringPosition;
 import org.firstinspires.ftc.teamcode.Utilities.Vector;
 
@@ -42,7 +43,7 @@ public class Drive extends LinearOpMode {
         while ( !isStarted() ) {
 
             //Toggle alliance on rising edge of a button
-            if (gamepad1.a) {
+            if (gamepad2.a) {
                 if (allianceToggle == false) {
                     switch (alliance) {
                         case RED:
@@ -99,29 +100,24 @@ public class Drive extends LinearOpMode {
                 //setting the drivetrain speed as a function of input values
                 robot.drivetrain.runDrivetrainFromCartesian(new Vector(x,y),rx,robot.getBotHeading());
 
-                //setting arm to go up (-80 ticks) when the left bumper is pressed
+                //setting arm to go up when the left bumper is pressed
                 if (gamepad1.x) {
-                    robot.arm.setTargetPosition(-340);
-                    robot.arm.setPower(1);
+                    robot.arm.armUp();
                 }
 
-                //setting arm to go down (0 ticks) when the right bumper is pressed
+                //setting arm to go down when the right bumper is pressed
                 if (gamepad1.y) {
-                    robot.arm.setTargetPosition(-10);
-                    robot.arm.setPower(0.8);
+                    robot.arm.armDown();
                 }
 
                 //setting the claw to move in, out, or neither depending on what combination of boolean inputs a and b give
                 if (gamepad1.a == gamepad1.b) {
-                    robot.claw.setPower(0);
-                    robot.wrist.setPosition(0.6);
+                    robot.arm.stopClaw();
                 } else {
                     if (gamepad1.a) {
-                        robot.claw.setPower(1);
-                        robot.wrist.setPosition(0.4);
+                        robot.arm.discharge();
                     } else {
-                        robot.claw.setPower(-1);
-                        robot.wrist.setPosition(0.35);
+                        robot.arm.intake();
                     }
                 }
 
@@ -132,6 +128,65 @@ public class Drive extends LinearOpMode {
 
                 if (gamepad1.left_trigger > 0 && gamepad1.right_trigger > 0) {
                     robot.dropPixel();
+                }
+
+                if (gamepad1.left_bumper) {
+                    robot.drivetrain.setDriveSpeed(DriveSpeed.STANDARD);
+                }
+                if (gamepad1.right_bumper) {
+                    robot.drivetrain.setDriveSpeed(DriveSpeed.PRECISE);
+                }
+
+            }
+
+            //running error correct specifc code
+            if (robot.driveMode == DriveMode.ERRORCORRECT) {
+
+                //resets yaw when guide button is clicked
+                if (gamepad1.guide) {
+                    robot.imu.resetYaw();
+                }
+
+                //manual changes to arm heights
+                if (gamepad1.a) {
+                    robot.arm.armDownPosition =+ 1;
+                }
+                if (gamepad1.b) {
+                    robot.arm.armDownPosition =- 1;
+                }
+                if (gamepad1.y) {
+                    robot.arm.armUpPosition =+ 1;
+                }
+                if (gamepad1.x) {
+                    robot.arm.armDownPosition =- 1;
+                }
+
+                //manual changes to wrist orientations
+                if (gamepad1.right_bumper) {
+                    robot.arm.wristActivePosition =+ 0.01;
+                }
+                if (gamepad1.left_bumper) {
+                    robot.arm.wristActivePosition =- 0.01;
+                }
+                if (gamepad1.right_trigger > 0) {
+                    robot.arm.wristNeutralPosition =+ 0.01;
+                }
+                if (gamepad1.left_trigger > 0) {
+                    robot.arm.wristNeutralPosition =- 0.01;
+                }
+
+                //manual changes to drive speed
+                if (gamepad1.dpad_up) {
+                    robot.drivetrain.standardDriveSpeed =+ 0.01;
+                }
+                if (gamepad1.dpad_down) {
+                    robot.drivetrain.standardDriveSpeed =- 0.01;
+                }
+                if (gamepad1.dpad_right) {
+                    robot.drivetrain.preciseDriveSpeed =+ 0.01;
+                }
+                if (gamepad1.dpad_left) {
+                    robot.drivetrain.preciseDriveSpeed =- 0.01;
                 }
 
             }
@@ -180,6 +235,9 @@ public class Drive extends LinearOpMode {
                             driveModeSetting = DriveMode.AUTOSCORE;
                             break;
                         case AUTOSCORE:
+                            driveModeSetting = DriveMode.ERRORCORRECT;
+                            break;
+                        case ERRORCORRECT:
                             driveModeSetting = DriveMode.MANUALDRIVE;
                             break;
                     }
@@ -222,17 +280,31 @@ public class Drive extends LinearOpMode {
                 case AUTOSCORE:
                     telemetry.addData("Drive Mode Setting:","Auto Scoring");
                     break;
+                case ERRORCORRECT:
+                    telemetry.addData("Drive Mode Setting:","Error Correct");
+                    break;
             }
-
-            telemetry.addData("Press [GUIDE] to commit mode","");
 
             switch (robot.driveMode) {
                 case MANUALDRIVE:
-                    telemetry.addData("Drive Mode Setting:","Manual Drive");
+                    telemetry.addData("Committed Drive Mode:","Manual Drive");
                     break;
                 case AUTOSCORE:
-                    telemetry.addData("Drive Mode Setting:","Auto Scoring");
+                    telemetry.addData("Committed Drive Mode:","Auto Scoring");
                     break;
+                case ERRORCORRECT:
+                    telemetry.addData("Committed Drive Mode:","Error Correct");
+                    break;
+            }
+
+            //Displays error correct settings only when in error correct mode
+            if (robot.driveMode == DriveMode.ERRORCORRECT) {
+                telemetry.addData("Arm Up Position:",robot.arm.armUpPosition);
+                telemetry.addData("Arm Down Position:",robot.arm.armDownPosition);
+                telemetry.addData("Wrist Active Position:",robot.arm.wristActivePosition);
+                telemetry.addData("Wrist Neutral Position:",robot.arm.wristNeutralPosition);
+                telemetry.addData("Standard Drive Speed:",robot.drivetrain.standardDriveSpeed);
+                telemetry.addData("Precise Drive Speed:",robot.drivetrain.preciseDriveSpeed);
             }
 
             telemetry.update();

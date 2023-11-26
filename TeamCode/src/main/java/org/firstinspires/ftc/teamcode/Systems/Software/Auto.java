@@ -61,10 +61,10 @@ public abstract class Auto extends LinearOpMode {
         boolean endPositionState = false;
 
         //Init loop to swap between auto settings
-        while (!isStarted()) {
+        while (!gamepad2.guide) {
 
             //Toggle alliance on rising edge of a button
-            if (gamepad1.a) {
+            if (gamepad2.a) {
                 if (allianceState == false) {
                     switch (alliance) {
                         case RED:
@@ -81,7 +81,7 @@ public abstract class Auto extends LinearOpMode {
             }
 
             //Toggle start position on rising edge of b button
-            if (gamepad1.b) {
+            if (gamepad2.b) {
                 if (startPositionState == false) {
                     switch (startPosition) {
                         case BACKSTAGE:
@@ -98,7 +98,7 @@ public abstract class Auto extends LinearOpMode {
             }
 
             //Toggle end position on rising edge of x button
-            if (gamepad1.x) {
+            if (gamepad2.x) {
                 if (endPositionState == false) {
                     switch (endPosition) {
                         case CORNER:
@@ -176,7 +176,7 @@ public abstract class Auto extends LinearOpMode {
 
         //creates a simple way of inverting some of the x and rx values plugged into a motor matrix. This is because these values are usually negated when switching alliance
         //if you want a value negated when the alliance color is blue, simply multiply it by "allianceInvert"
-        int allianceInvert;
+        double allianceInvert;
         if (alliance == Alliance.RED) {
             allianceInvert = 1;
         } else {
@@ -185,44 +185,51 @@ public abstract class Auto extends LinearOpMode {
 
         waitForStart();
 
+        //Drive forward to center of spike marks
         smartSleep(1);
         robot.drivetrain.runDrivetrainFromCartesian(new Vector(0,0.5), 0, robot.getBotHeading());
         smartSleep(2.1);
         robot.drivetrain.stop();
         smartSleep(1);
 
-        robot.setTargetOrientation( Math.PI/2 );
-        robot.driveMode = DriveMode.ORIENT;
+        //Rotate so robot is facing away from left spike mark
+        robot.setTargetOrientation( 0 );
+        robot.setDriveMode(DriveMode.ORIENT);
         smartSleep(0.9); //0.9
-        robot.driveMode = DriveMode.MANUALDRIVE;
+        robot.setDriveMode(DriveMode.MANUALDRIVE);
         robot.drivetrain.stop();
         smartSleep(0.5);
 
         //detect prop
 
-        robot.setTargetOrientation( Math.PI );
-        robot.driveMode = DriveMode.ORIENT;
-        smartSleep(0.9); //0.9
-        robot.driveMode = DriveMode.MANUALDRIVE;
-        robot.drivetrain.stop();
-        smartSleep(0.5);
-
-        //detect prop
-
+        //Rotate so robot is facing away from middle spike mark
         robot.setTargetOrientation( 3 * (Math.PI/2) );
-        robot.driveMode = DriveMode.ORIENT;
+        robot.setDriveMode(DriveMode.ORIENT);
         smartSleep(0.9); //0.9
-        robot.driveMode = DriveMode.MANUALDRIVE;
+        robot.setDriveMode(DriveMode.MANUALDRIVE);
+        robot.drivetrain.stop();
         smartSleep(0.5);
 
         //detect prop
 
-        switch(propPosition) {
+        //Rotate so robot is facing away from right spike mark
+        robot.setTargetOrientation( Math.PI );
+        robot.setDriveMode(DriveMode.ORIENT);
+        smartSleep(0.9); //0.9
+        robot.setDriveMode(DriveMode.MANUALDRIVE);
+        smartSleep(0.5);
+
+        //detect prop
+
+        //score differently depending on where the prop was detected
+        switch (propPosition) {
             case LEFT:
-                robot.setTargetOrientation( Math.PI );
-                robot.driveMode = DriveMode.ORIENT;
+
+                //drop pixel on left spike mark
+                robot.setTargetOrientation( 3 * (Math.PI/2) );
+                robot.setDriveMode(DriveMode.ORIENT);
                 smartSleep(0.9); //0.9
-                robot.driveMode = DriveMode.MANUALDRIVE;
+                robot.setDriveMode(DriveMode.MANUALDRIVE);
                 robot.drivetrain.runDrivetrainFromCartesian(new Vector(-0.5,0), 0, robot.getBotHeading());
                 smartSleep(0.9);
                 robot.drivetrain.stop();
@@ -230,17 +237,20 @@ public abstract class Auto extends LinearOpMode {
                 robot.dropPixel();
                 smartSleep(0.3);
 
+                //drive back to center
                 robot.drivetrain.runDrivetrainFromCartesian(new Vector(0.5,0),0,robot.getBotHeading());
                 smartSleep(0.9);
-                robot.setTargetOrientation( Math.PI/2 );
-                robot.driveMode = DriveMode.ORIENT;
+                robot.setTargetOrientation( 0 );
+                robot.setDriveMode(DriveMode.ORIENT);
                 smartSleep(0.9); //0.9
-                robot.driveMode = DriveMode.MANUALDRIVE;
+                robot.setDriveMode(DriveMode.MANUALDRIVE);
                 robot.drivetrain.stop();
 
                 break;
 
             case MIDDLE:
+
+                //drop pixel on center spike mark
                 smartSleep(0.9);
                 robot.drivetrain.runDrivetrainFromCartesian(new Vector(0,0.5), 0, robot.getBotHeading());
                 smartSleep(0.9);
@@ -249,20 +259,23 @@ public abstract class Auto extends LinearOpMode {
                 robot.dropPixel();
                 smartSleep(0.3);
 
+                //drive back to center
                 robot.drivetrain.runDrivetrainFromCartesian(new Vector(0,-0.5),0,robot.getBotHeading());
                 smartSleep(0.9);
-                robot.setTargetOrientation( Math.PI/2 );
-                robot.driveMode = DriveMode.ORIENT;
+                robot.setTargetOrientation( 0 );
+                robot.setDriveMode(DriveMode.ORIENT);
                 smartSleep(0.9); //0.9
-                robot.driveMode = DriveMode.MANUALDRIVE;
+                robot.setDriveMode(DriveMode.MANUALDRIVE);
                 robot.drivetrain.stop();
                 break;
 
             case RIGHT:
-                robot.setTargetOrientation( 0 );
-                robot.driveMode = DriveMode.ORIENT;
+
+                //drop pixel on right spike mark
+                robot.setTargetOrientation( Math.PI/2 );
+                robot.setDriveMode(DriveMode.ORIENT);
                 smartSleep(0.9); //0.9
-                robot.driveMode = DriveMode.MANUALDRIVE;
+                robot.setDriveMode(DriveMode.MANUALDRIVE);
                 robot.drivetrain.runDrivetrainFromCartesian(new Vector(0.5,0), 0, robot.getBotHeading());
                 smartSleep(0.9);
                 robot.drivetrain.stop();
@@ -270,24 +283,25 @@ public abstract class Auto extends LinearOpMode {
                 robot.dropPixel();
                 smartSleep(0.3);
 
+                //drive back to center
                 robot.drivetrain.runDrivetrainFromCartesian(new Vector(-0.5,0),0,robot.getBotHeading());
                 smartSleep(0.9);
-                robot.setTargetOrientation( Math.PI/2 );
-                robot.driveMode = DriveMode.ORIENT;
+                robot.setTargetOrientation( 0 );
+                robot.setDriveMode(DriveMode.ORIENT);
                 smartSleep(0.9); //0.9
-                robot.driveMode = DriveMode.MANUALDRIVE;
+                robot.setDriveMode(DriveMode.MANUALDRIVE);
                 robot.drivetrain.stop();
                 break;
         }
 
-        // makes robot raise arm and drive towards board
-        robot.arm.setTargetPosition(-340);
+        //makes robot raise arm and drive towards board
+        robot.arm.armUp();
         robot.drivetrain.runDrivetrainFromCartesian(new Vector(-0.5, 0),0, robot.getBotHeading());
         smartSleep(2.5);
         robot.drivetrain.stop();
 
         //moves drivetrain to right position for scoring
-        switch(propPosition){
+        switch (propPosition) {
 
             case LEFT:
                 robot.drivetrain.runDrivetrainFromCartesian(new Vector(0, -0.5),0, robot.getBotHeading());
@@ -303,15 +317,15 @@ public abstract class Auto extends LinearOpMode {
 
         }
 
-        robot.claw.setPower(1);
-        smartSleep(0.97);
-        robot.claw.setPower(0);
+        //drops pre-loaded pixel and lowers arm
+        robot.arm.discharge();
+        smartSleep(1);
+        robot.arm.stopClaw();
+        robot.arm.armDown();
 
-        robot.arm.setTargetPosition(0);
 
-
-        //
-        switch(propPosition){
+        //re-centers robot
+        switch (propPosition) {
 
             case LEFT:
                 robot.drivetrain.runDrivetrainFromCartesian(new Vector (0,0.5), 0, robot.getBotHeading());
@@ -326,8 +340,6 @@ public abstract class Auto extends LinearOpMode {
                 robot.drivetrain.stop();
                 break;
         }
-
-
 
     }
 

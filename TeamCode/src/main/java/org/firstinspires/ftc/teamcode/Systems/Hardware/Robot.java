@@ -10,6 +10,7 @@ import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.teamcode.Systems.Hardware.Subsystems.Arm;
 import org.firstinspires.ftc.teamcode.Systems.Hardware.Subsystems.Drivetrain;
 import org.firstinspires.ftc.teamcode.Systems.Software.SoftwareEnums.AutoScoringState;
 import org.firstinspires.ftc.teamcode.Utilities.Vector;
@@ -20,14 +21,12 @@ public class Robot {
     //defining attributes which will be used in the code (sensors, motors, and other variables)
     public Drivetrain drivetrain = new Drivetrain();
     public IMU imu;
-    public DcMotor arm;
-    public Servo wrist;
-    public CRServo claw;
+    public Arm arm = new Arm();
     public Servo launcher;
     public CRServo dropper;
     public ColorSensor colorSensor;
     public final double TICKS_PER_INCH = 57.953;
-    public double startAngle;
+    public double angleOffset;
     private LinearOpMode opMode;
     private Vector position = new Vector(0,0);
     private double lastLFPosition;
@@ -52,7 +51,7 @@ public class Robot {
      */
 
     public double getBotHeading() {
-        return -(imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS) - startAngle) % (2 * Math.PI);
+        return (-imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS) + angleOffset) % (2 * Math.PI);
     }
 
     /**
@@ -87,36 +86,36 @@ public class Robot {
         drivetrain.rbMotor = opMode.hardwareMap.get(DcMotor.class, "rb_motor");
 
         //configuring motors so they move in the right direction
-        drivetrain.lfMotor.setDirection(DcMotorSimple.Direction.REVERSE);
+        drivetrain.lfMotor.setDirection(DcMotorSimple.Direction.FORWARD);
         drivetrain.rfMotor.setDirection(DcMotorSimple.Direction.FORWARD);
-        drivetrain.lbMotor.setDirection(DcMotorSimple.Direction.REVERSE);
+        drivetrain.lbMotor.setDirection(DcMotorSimple.Direction.FORWARD);
         drivetrain.rbMotor.setDirection(DcMotorSimple.Direction.FORWARD);
 
         //attaching imu to variable and getting the gyroscope set up
         imu = opMode.hardwareMap.get(IMU.class,"imu");
-        IMU.Parameters parameters = new IMU.Parameters(new RevHubOrientationOnRobot(RevHubOrientationOnRobot.LogoFacingDirection.UP,RevHubOrientationOnRobot.UsbFacingDirection.LEFT));
+        IMU.Parameters parameters = new IMU.Parameters(new RevHubOrientationOnRobot(RevHubOrientationOnRobot.LogoFacingDirection.UP,RevHubOrientationOnRobot.UsbFacingDirection.BACKWARD));
         imu.initialize(parameters);
         imu.resetYaw();
 
         //getting the initial angle on the robot
-        startAngle = imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS);
+        angleOffset = Math.PI/2;
 
         //attaching arm/launcher motors and servos
-        arm = opMode.hardwareMap.get(DcMotor.class, "arm");
-        wrist = opMode.hardwareMap.get(Servo.class,"wrist");
-        claw = opMode.hardwareMap.get(CRServo.class,"claw");
+        arm.shoulder = opMode.hardwareMap.get(DcMotor.class, "arm");
+        arm.wrist = opMode.hardwareMap.get(Servo.class,"wrist");
+        arm.claw = opMode.hardwareMap.get(CRServo.class,"claw");
         launcher = opMode.hardwareMap.get(Servo.class,"launcher");
         dropper = opMode.hardwareMap.get(CRServo.class,"dropper");
 
         //configuring the arm so it is in the right mode at the right power
-        arm.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        arm.setTargetPosition(0);
-        arm.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        arm.setPower(1);
+        arm.shoulder.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        arm.shoulder.setTargetPosition(0);
+        arm.shoulder.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        arm.shoulder .setPower(1);
 
         //setting up the servos to be in the right position
-        wrist.setPosition(0.6);
-        claw.setPower(0);
+        arm.wrist.setPosition(0.6);
+        arm.claw.setPower(0);
         launcher.setPosition(1);
         dropper.setPower(0);
 
