@@ -10,6 +10,8 @@ import org.firstinspires.ftc.teamcode.Systems.Hardware.Robot;
 import org.firstinspires.ftc.teamcode.Systems.Software.SoftwareEnums.DriveSpeed;
 import org.firstinspires.ftc.teamcode.Systems.Software.SoftwareEnums.FieldOfReference;
 import org.firstinspires.ftc.teamcode.Systems.Software.SoftwareEnums.ScoringPosition;
+import org.firstinspires.ftc.teamcode.Systems.Software.SoftwareEnums.TurningMode;
+import org.firstinspires.ftc.teamcode.Utilities.TargetTurn;
 import org.firstinspires.ftc.teamcode.Utilities.Vector;
 
 @TeleOp(name = "Drive")
@@ -20,12 +22,24 @@ public class Drive extends LinearOpMode {
     double x = 0;
     double y = 0;
     double rx = 0;
+    double ry = 0;
 
-    DriveMode driveModeSetting = DriveMode.MANUALDRIVE;
-    boolean driveModeSettingToggle = false;
+    double turn = 0;
+
+    boolean turningModeToggle = false;
     boolean allianceToggle = false;
     boolean scoringPositionToggle = false;
     boolean fieldOfReferenceToggle = false;
+
+    boolean orientInvertToggle = false;
+    boolean orientSetToggle = false;
+
+    double secondsUpdate = 0;
+
+    int updatesPerSecond = 0;
+    int loopCounter = 0;
+
+    Vector joystickOrient;
 
     //creating a robot object, every input (ex. reading a sensor value) and output (ex. running a motor) is run through this class
     Robot robot = new Robot(this);
@@ -71,118 +85,241 @@ public class Drive extends LinearOpMode {
         //loop that runs while the program is active
         while (opModeIsActive()) {
 
+            //some code to get the update speed
+            loopCounter++;
+            if (robot.runtime.seconds() >= secondsUpdate + 1) {
+                secondsUpdate += 1;
+                updatesPerSecond = loopCounter;
+                loopCounter = 0;
+            }
+
             robot.update();
 
             telemetry.addData("Position:",robot.getPosition().string());
-            telemetry.addData("Orientation:",robot.getBotHeading());
+            telemetry.addData("Orientation:",Float.toString( (float) (robot.getBotHeading() / Math.PI) ) + "π" );
+            if (robot.driveMode == DriveMode.ORIENT) {
+                telemetry.addData("Target Orientation:",Float.toString( (float) (robot.getTargetOrientation() / Math.PI) ) + "π" );
+            }
+            telemetry.addData("Updates per Second:",updatesPerSecond);
 
             //running drive mode specific code
-            if (robot.driveMode == DriveMode.MANUALDRIVE) {
+            switch (robot.driveMode) {
+                case MANUAL_DRIVE:
 
-                //Manual drive controls
+                    //Manual drive controls
 
-                //setting variables to gamepad values
-                x = gamepad1.left_stick_x;
-                y = -gamepad1.left_stick_y;
-                rx = gamepad1.right_stick_x;
+                    //setting variables to gamepad values
+                    x = gamepad1.left_stick_x;
+                    y = -gamepad1.left_stick_y;
+                    rx = gamepad1.right_stick_x;
+                    ry = -gamepad1.right_stick_y;
 
-                //setting the drivetrain speed as a function of input values
-                robot.drivetrain.runDrivetrainFromCartesian(new Vector(x,y),-rx, (robot.fieldOfReference == FieldOfReference.FIELD_CENTRIC) ? robot.getBotHeading() : 0.5 * Math.PI );
-
-                //setting arm to go up when the left bumper is pressed
-                if (gamepad1.x) {
-                    robot.arm.armUp();
-                }
-
-                //setting arm to go down when the right bumper is pressed
-                if (gamepad1.y) {
-                    robot.arm.armDown();
-                }
-
-                //setting the claw to move in, out, or neither depending on what combination of boolean inputs a and b give
-                if (gamepad1.a == gamepad1.b) {
-                    robot.arm.stopClaw();
-                } else {
-                    if (gamepad1.a) {
-                        robot.arm.discharge();
-                    } else {
-                        robot.arm.intake();
+                    switch (robot.turningMode) {
+                        case STANDARD:
+                            turn = -rx;
+                            break;
+                        case STANDARD_SNAP:
+                            if (rx == 0) {
+                                turn = TargetTurn.getTurn(robot.getBotHeading(), (0.5 * Math.PI) * Math.round( robot.getBotHeading() / (0.5 * Math.PI) ));
+                            } else {
+                                turn = -rx;
+                            }
+                            break;
+                        case TARGET:
+                            if (new Vector(rx,ry).magnitude() > 0.9) {
+                                turn = TargetTurn.getTurn(robot.getBotHeading(),new Vector(rx,ry).angle());
+                            } else {
+                                turn = 0;
+                            }
+                            break;
+                        case TARGET_SNAP:
+                            if (new Vector(rx,ry).magnitude() > 0.9) {
+                                turn = TargetTurn.getTurn(robot.getBotHeading(), (0.5 * Math.PI) * Math.round(new Vector(rx, ry).angle() / (0.5 * Math.PI)));
+                            } else {
+                                turn = 0;
+                            }
+                            break;
                     }
-                }
 
-                //launching the paper airplane when the guide button is clicked
-                if (gamepad1.guide) {
-                    robot.launchDrone();
-                }
+                    //setting the drivetrain speed as a function of input values
+                    robot.drivetrain.runDrivetrainFromCartesian(new Vector(x,y),turn, (robot.fieldOfReference == FieldOfReference.FIELD_CENTRIC) ? robot.getBotHeading() : 0.5 * Math.PI );
 
-                if (gamepad1.left_trigger > 0 && gamepad1.right_trigger > 0) {
-                    robot.dropPixel();
-                }
+                    //setting arm to go up when the left bumper is pressed
+                    if (gamepad1.x) {
+                        robot.arm.armUp();
+                    }
 
-                if (gamepad1.left_bumper) {
-                    robot.drivetrain.setDriveSpeed(DriveSpeed.STANDARD);
-                }
-                if (gamepad1.right_bumper) {
-                    robot.drivetrain.setDriveSpeed(DriveSpeed.PRECISE);
-                }
+                    //setting arm to go down when the right bumper is pressed
+                    if (gamepad1.y) {
+                        robot.arm.armDown();
+                    }
+
+                    //setting the claw to move in, out, or neither depending on what combination of boolean inputs a and b give
+                    if (gamepad1.a == gamepad1.b) {
+                        robot.arm.stopClaw();
+                    } else {
+                        if (gamepad1.a) {
+                            robot.arm.discharge();
+                        } else {
+                            robot.arm.intake();
+                        }
+                    }
+
+                    //launching the paper airplane when the guide button is clicked
+                    if (gamepad1.guide) {
+                        robot.launchDrone();
+                    }
+
+                    if (gamepad1.left_trigger > 0 && gamepad1.right_trigger > 0) {
+                        robot.dropPixel();
+                    } else {
+                        robot.stopDropping();
+                    }
+
+                    if (gamepad1.left_bumper) {
+                        robot.drivetrain.setDriveSpeed(DriveSpeed.STANDARD);
+                    }
+                    if (gamepad1.right_bumper) {
+                        robot.drivetrain.setDriveSpeed(DriveSpeed.PRECISE);
+                    }
+
+                    break;
+
+                case ERROR_CORRECT:
+
+                    //error correct controls
+
+                    //resets yaw when guide button is clicked
+                    if (gamepad1.guide) {
+                        robot.imu.resetYaw();
+                    }
+
+                    //manual changes to arm heights
+                    if (gamepad1.a) {
+                        robot.arm.armDownPosition += 1;
+                    }
+                    if (gamepad1.b) {
+                        robot.arm.armDownPosition -= 1;
+                    }
+                    if (gamepad1.y) {
+                        robot.arm.armUpPosition += 1;
+                    }
+                    if (gamepad1.x) {
+                        robot.arm.armDownPosition -= 1;
+                    }
+
+                    //manual changes to wrist orientations
+                    if (gamepad1.right_bumper) {
+                        robot.arm.wristActivePosition += 0.01;
+                    }
+                    if (gamepad1.left_bumper) {
+                        robot.arm.wristActivePosition -= 0.01;
+                    }
+                    if (gamepad1.right_trigger > 0) {
+                        robot.arm.wristNeutralPosition += 0.01;
+                    }
+                    if (gamepad1.left_trigger > 0) {
+                        robot.arm.wristNeutralPosition -= 0.01;
+                    }
+
+                    //manual changes to drive speed
+                    if (gamepad1.left_stick_y > 0.9) {
+                        robot.drivetrain.standardDriveSpeed += 0.01;
+                    }
+                    if (gamepad1.left_stick_y < -0.9) {
+                        robot.drivetrain.standardDriveSpeed -= 0.01;
+                    }
+                    if (gamepad1.left_stick_x > 0.9) {
+                        robot.drivetrain.preciseDriveSpeed += 0.01;
+                    }
+                    if (gamepad1.left_stick_x < -0.9) {
+                        robot.drivetrain.preciseDriveSpeed -= 0.01;
+                    }
+
+                    //manual changes to arm power
+                    if (gamepad1.right_stick_y > 0.9) {
+                        robot.arm.armDownPower += 0.01;
+                    }
+                    if (gamepad1.right_stick_y < -0.9) {
+                        robot.arm.armDownPower -= 0.01;
+                    }
+                    if (gamepad1.right_stick_x > 0.9) {
+                        robot.arm.armUpPower += 0.01;
+                    }
+                    if (gamepad1.right_stick_x< -0.9) {
+                        robot.arm.armUpPower -= 0.01;
+                    }
+
+                    break;
+
+                case ORIENT:
+
+                    //orient controls
+
+                    //resets yaw when guide button is clicked
+                    if (gamepad1.guide) {
+                        robot.imu.resetYaw();
+                    }
+
+                    if (gamepad1.b) {
+                        robot.setTargetOrientation(0); //right
+                    }
+                    if (gamepad1.y) {
+                        robot.setTargetOrientation(0.5 * Math.PI); //forwards
+                    }
+                    if (gamepad1.x) {
+                        robot.setTargetOrientation(Math.PI); //left
+                    }
+                    if (gamepad1.a) {
+                        robot.setTargetOrientation(1.5 * Math.PI); //backwards
+                    }
+
+                    //make changes to target orientation
+                    if (gamepad1.left_stick_y > 0.9) {
+                        robot.setTargetOrientation(robot.getTargetOrientation() - 0.002);
+                    }
+                    if (gamepad1.left_stick_y < -0.9) {
+                        robot.setTargetOrientation(robot.getTargetOrientation() + 0.002);
+                    }
+                    if (gamepad1.left_stick_x > 0.9) {
+                        robot.setTargetOrientation(robot.getTargetOrientation() - 0.01);
+                    }
+                    if (gamepad1.left_stick_x < -0.9) {
+                        robot.setTargetOrientation(robot.getTargetOrientation() + 0.01);
+                    }
+
+                    if (gamepad1.left_bumper) {
+                        if (!orientInvertToggle) {
+                            robot.setTargetOrientation(robot.getTargetOrientation() + Math.PI);
+                        }
+                        orientInvertToggle = true;
+                    } else {
+                        orientInvertToggle = false;
+                    }
+
+                    if (gamepad1.right_bumper) {
+                        if (!orientSetToggle) {
+                            robot.setTargetOrientation(robot.getBotHeading());
+                        }
+                        orientSetToggle = true;
+                    } else {
+                        orientSetToggle = false;
+                    }
+
+                    //sets the orientation to the joystick
+                    joystickOrient = new Vector(gamepad1.right_stick_x,-gamepad1.right_stick_y);
+
+                    if (joystickOrient.magnitude() > 0.9) {
+                        robot.setTargetOrientation(joystickOrient.angle());
+                    }
+
+                    break;
 
             }
 
-            //running error correct specific code
-            if (robot.driveMode == DriveMode.ERRORCORRECT) {
-
-                //resets yaw when guide button is clicked
-                if (gamepad1.guide) {
-                    robot.imu.resetYaw();
-                }
-
-                //manual changes to arm heights
-                if (gamepad1.a) {
-                    robot.arm.armDownPosition += 1;
-                }
-                if (gamepad1.b) {
-                    robot.arm.armDownPosition -= 1;
-                }
-                if (gamepad1.y) {
-                    robot.arm.armUpPosition += 1;
-                }
-                if (gamepad1.x) {
-                    robot.arm.armDownPosition -= 1;
-                }
-
-                //manual changes to wrist orientations
-                if (gamepad1.right_bumper) {
-                    robot.arm.wristActivePosition += 0.01;
-                }
-                if (gamepad1.left_bumper) {
-                    robot.arm.wristActivePosition -= 0.01;
-                }
-                if (gamepad1.right_trigger > 0) {
-                    robot.arm.wristNeutralPosition += 0.01;
-                }
-                if (gamepad1.left_trigger > 0) {
-                    robot.arm.wristNeutralPosition -= 0.01;
-                }
-
-                //manual changes to drive speed
-                if (gamepad1.dpad_up) {
-                    robot.drivetrain.standardDriveSpeed += 0.01;
-                }
-                if (gamepad1.dpad_down) {
-                    robot.drivetrain.standardDriveSpeed -= 0.01;
-                }
-                if (gamepad1.dpad_right) {
-                    robot.drivetrain.preciseDriveSpeed += 0.01;
-                }
-                if (gamepad1.dpad_left) {
-                    robot.drivetrain.preciseDriveSpeed -= 0.01;
-                }
-
-            }
-
-            //stop robot upon emergency brake
-            if (gamepad2.left_trigger > 0 && gamepad2.right_trigger > 0) {
-                robot.setDriveMode(DriveMode.EMERGENCYBRAKE);
+            //stop robot upon emergency brake (both operator and driver can use this)
+            if (gamepad2.back || gamepad1.back) {
+                robot.setDriveMode(DriveMode.EMERGENCY_BRAKE);
             }
 
             //Toggle alliance on rising edge of a button
@@ -239,27 +376,39 @@ public class Drive extends LinearOpMode {
             }
 
             if (gamepad2.x) {
-                if (!driveModeSettingToggle) {
-                    switch (driveModeSetting) {
-                        case MANUALDRIVE:
-                            driveModeSetting = DriveMode.AUTOSCORE;
+                if (!turningModeToggle) {
+                    switch (robot.turningMode) {
+                        case STANDARD:
+                            robot.turningMode = TurningMode.STANDARD_SNAP;
                             break;
-                        case AUTOSCORE:
-                            driveModeSetting = DriveMode.ERRORCORRECT;
+                        case STANDARD_SNAP:
+                            robot.turningMode = TurningMode.TARGET;
                             break;
-                        case ERRORCORRECT:
-                            driveModeSetting = DriveMode.MANUALDRIVE;
+                        case TARGET:
+                            robot.turningMode = TurningMode.TARGET_SNAP;
+                            break;
+                        case TARGET_SNAP:
+                            robot.turningMode = TurningMode.STANDARD;
                             break;
                     }
                 }
-                driveModeSettingToggle = true;
+                turningModeToggle = true;
             } else {
-                driveModeSettingToggle = false;
+                turningModeToggle = false;
             }
 
-            //commit drive mode when guide button is clicked
-            if (gamepad2.guide) {
-                robot.driveMode = driveModeSetting;
+            //drive mode quick selects (both operator and driver can use these)
+            if ( (gamepad2.dpad_up || gamepad1.dpad_up) && robot.getDriveMode() != DriveMode.MANUAL_DRIVE) {
+                robot.driveMode = DriveMode.MANUAL_DRIVE;
+            }
+            if ( (gamepad2.dpad_left || gamepad1.dpad_left) && robot.getDriveMode() != DriveMode.AUTO_SCORE) {
+                robot.driveMode = DriveMode.AUTO_SCORE;
+            }
+            if ( (gamepad2.dpad_right || gamepad1.dpad_right) && robot.getDriveMode() != DriveMode.ORIENT) {
+                robot.driveMode = DriveMode.ORIENT;
+            }
+            if ( (gamepad2.dpad_down || gamepad1.dpad_down) && robot.getDriveMode() != DriveMode.ERROR_CORRECT) {
+                robot.driveMode = DriveMode.ERROR_CORRECT;
             }
 
             //Displays Alliance
@@ -284,7 +433,7 @@ public class Drive extends LinearOpMode {
                     break;
             }
 
-            //Displays Scoring Position
+            //Displays Field Of Reference
             switch (robot.fieldOfReference) {
                 case FIELD_CENTRIC:
                     telemetry.addData("Field Of Reference:","FIELD CENTRIC");
@@ -294,39 +443,47 @@ public class Drive extends LinearOpMode {
                     break;
             }
 
-            //Displays Drive Mode Setting
-            switch (driveModeSetting) {
-                case MANUALDRIVE:
-                    telemetry.addData("Drive Mode Setting:","Manual Drive");
+            //Displays Turning Mode
+            switch (robot.turningMode) {
+                case STANDARD:
+                    telemetry.addData("Turning Mode:","STANDARD");
                     break;
-                case AUTOSCORE:
-                    telemetry.addData("Drive Mode Setting:","Auto Scoring");
+                case STANDARD_SNAP:
+                    telemetry.addData("Turning Mode:","STANDARD SNAP");
                     break;
-                case ERRORCORRECT:
-                    telemetry.addData("Drive Mode Setting:","Error Correct");
+                case TARGET:
+                    telemetry.addData("Turning Mode:","TARGET");
+                    break;
+                case TARGET_SNAP:
+                    telemetry.addData("Turning Mode:","TARGET SNAP");
                     break;
             }
 
             //Displays Committed Drive Mode
             switch (robot.driveMode) {
-                case MANUALDRIVE:
-                    telemetry.addData("Committed Drive Mode:","Manual Drive");
+                case MANUAL_DRIVE:
+                    telemetry.addData("Committed Drive Mode:","MANUAL DRIVE");
                     break;
-                case AUTOSCORE:
-                    telemetry.addData("Committed Drive Mode:","Auto Scoring");
+                case AUTO_SCORE:
+                    telemetry.addData("Committed Drive Mode:","AUTO SCORE");
                     break;
-                case ERRORCORRECT:
-                    telemetry.addData("Committed Drive Mode:","Error Correct");
+                case ERROR_CORRECT:
+                    telemetry.addData("Committed Drive Mode:","ERROR CORRECT");
                     break;
-                case EMERGENCYBRAKE:
-                    telemetry.addData("Committed Drive Mode:","Emergency Brake");
+                case ORIENT:
+                    telemetry.addData("Committed Drive Mode:","ORIENT");
+                    break;
+                case EMERGENCY_BRAKE:
+                    telemetry.addData("Committed Drive Mode:","EMERGENCY BRAKE");
                     break;
             }
 
             //Displays error correct settings only when in error correct mode
-            if (robot.driveMode == DriveMode.ERRORCORRECT) {
+            if (robot.driveMode == DriveMode.ERROR_CORRECT) {
                 telemetry.addData("Arm Up Position:",robot.arm.armUpPosition);
                 telemetry.addData("Arm Down Position:",robot.arm.armDownPosition);
+                telemetry.addData("Arm Up Power:",robot.arm.armUpPower);
+                telemetry.addData("Arm Down Power:",robot.arm.armDownPower);
                 telemetry.addData("Wrist Active Position:",robot.arm.wristActivePosition);
                 telemetry.addData("Wrist Neutral Position:",robot.arm.wristNeutralPosition);
                 telemetry.addData("Standard Drive Speed:",robot.drivetrain.standardDriveSpeed);
@@ -337,4 +494,3 @@ public class Drive extends LinearOpMode {
         }
     }
 }
-

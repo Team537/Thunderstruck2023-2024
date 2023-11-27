@@ -31,7 +31,7 @@ public class MotorMatrix {
      * @param botHeading the orientation of the robot (in radians)
      * @param multiplier a scalar all motor speeds will be multiplied by
      */
-    public void setMotorMatrixFromCartesian(Vector linear, double rx, double botHeading, double multiplier) {
+    public void setMotorMatrixFromCartesian(Vector linear, double rx, double botHeading, double multiplier, double turningRatio) {
 
         //reducing <x,y> to a unit vector if its magnitude exceeds 1
         //this is important because quick joystick rotations can result in unpredictable values and the robot not turning in a correct direction
@@ -53,8 +53,8 @@ public class MotorMatrix {
         Vector rotatedLinear = Vector.rotate(clampedLinear,botHeading);
 
         //calculating the values used for linear velocity of the motors
-        double cosineMove = (rotatedLinear.x - rotatedLinear.y)/Math.sqrt(2);
-        double sineMove = (rotatedLinear.x + rotatedLinear.y)/Math.sqrt(2);
+        double cosineMove = ((rotatedLinear.x - rotatedLinear.y)/Math.sqrt(2)) * (1-(Math.abs(rx)*turningRatio));
+        double sineMove = ((rotatedLinear.x + rotatedLinear.y)/Math.sqrt(2)) * (1-(Math.abs(rx)*turningRatio));
 
         double cosinePivot;
         double sinePivot;

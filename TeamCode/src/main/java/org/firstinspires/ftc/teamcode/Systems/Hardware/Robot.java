@@ -17,6 +17,8 @@ import org.firstinspires.ftc.teamcode.Systems.Software.SoftwareEnums.Alliance;
 import org.firstinspires.ftc.teamcode.Systems.Software.SoftwareEnums.AutoScoringState;
 import org.firstinspires.ftc.teamcode.Systems.Software.SoftwareEnums.FieldOfReference;
 import org.firstinspires.ftc.teamcode.Systems.Software.SoftwareEnums.ScoringPosition;
+import org.firstinspires.ftc.teamcode.Systems.Software.SoftwareEnums.TurningMode;
+import org.firstinspires.ftc.teamcode.Utilities.TargetTurn;
 import org.firstinspires.ftc.teamcode.Utilities.Vector;
 import org.firstinspires.ftc.teamcode.Systems.Software.SoftwareEnums.DriveMode;
 
@@ -46,15 +48,16 @@ public class Robot {
 
     private double targetOrientation = 0.5 * Math.PI;
 
-    public DriveMode driveMode = DriveMode.MANUALDRIVE;
+    public DriveMode driveMode = DriveMode.MANUAL_DRIVE;
     public AutoScoringState autoScoringState = AutoScoringState.ORIENT;
     public Alliance alliance = Alliance.RED;
     public ScoringPosition scoringPosition = ScoringPosition.CENTER;
     public FieldOfReference fieldOfReference = FieldOfReference.FIELD_CENTRIC;
+    public TurningMode turningMode = TurningMode.STANDARD;
 
     public final double TICKS_PER_INCH = 57.953;
 
-    ElapsedTime runtime = new ElapsedTime();
+    public ElapsedTime runtime = new ElapsedTime();
     public Robot(LinearOpMode linearOpMode) {
         this.opMode = linearOpMode;
     }
@@ -86,16 +89,27 @@ public class Robot {
     }
 
     /**
-     * drops the purple pixel on the spike mark during autonomous
+     * drops the pixel on the spike mark during autonomous
      */
     public void dropPixel() {
         dropper.setPower(-1);
-        this.smartSleep(1);
+    }
+
+    /**
+     * stops dropping the pixel
+     */
+    public void stopDropping() {
         dropper.setPower(0);
     }
 
+
+
     public void setTargetOrientation(double angle) {
         targetOrientation = angle % (2 * Math.PI);
+    }
+
+    public double getTargetOrientation() {
+        return targetOrientation;
     }
 
     /**
@@ -109,11 +123,15 @@ public class Robot {
         drivetrain.lbMotor = opMode.hardwareMap.get(DcMotor.class, "lb_motor");
         drivetrain.rbMotor = opMode.hardwareMap.get(DcMotor.class, "rb_motor");
 
-        //configuring motors so they move in the right direction
+        //configuring motors so they move in the right direction and set their zero power behavior correctly
         drivetrain.lfMotor.setDirection(DcMotorSimple.Direction.REVERSE);
         drivetrain.rfMotor.setDirection(DcMotorSimple.Direction.FORWARD);
         drivetrain.lbMotor.setDirection(DcMotorSimple.Direction.REVERSE);
         drivetrain.rbMotor.setDirection(DcMotorSimple.Direction.FORWARD);
+        drivetrain.lfMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+        drivetrain.rfMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+        drivetrain.rbMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+        drivetrain.lbMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
 
         //attaching imu to variable and getting the gyroscope set up
         imu = opMode.hardwareMap.get(IMU.class,"imu");
@@ -161,10 +179,16 @@ public class Robot {
         this.drivetrain.stop();
 
         switch (driveMode) {
-            case AUTOSCORE:
+            case AUTO_SCORE:
                 autoScoringState = AutoScoringState.ORIENT;
+                this.arm.shoulder.setPower(1);
+                this.drivetrain.lfMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+                this.drivetrain.rfMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+                this.drivetrain.rbMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+                this.drivetrain.lbMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
                 break;
-            case MANUALDRIVE:
+            case MANUAL_DRIVE:
+            case ORIENT:
                 //in case the power was changed via emergency brake, set power back on for the shoulder
                 this.arm.shoulder.setPower(1);
                 this.drivetrain.lfMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
@@ -209,20 +233,10 @@ public class Robot {
         switch(this.driveMode) {
 
             case ORIENT:
-                Vector orientationVector = Vector.fromPolar(1,this.getBotHeading());
-                Vector targetVector = Vector.fromPolar(1,targetOrientation);
-                if (Vector.dot(orientationVector,targetVector) > 0) {
-                    this.drivetrain.runDrivetrainFromCartesian(new Vector(0, 0), Vector.cross(orientationVector, targetVector), this.getBotHeading());
-                } else {
-                    if (Vector.cross(orientationVector, targetVector) > 0) {
-                        this.drivetrain.runDrivetrainFromCartesian(new Vector(0, 0), 1, this.getBotHeading());
-                    } else {
-                        this.drivetrain.runDrivetrainFromCartesian(new Vector(0, 0), -1, this.getBotHeading());
-                    }
-                }
+                this.drivetrain.runDrivetrainFromCartesian(new Vector(0,0), TargetTurn.getTurn(this.getBotHeading(),this.targetOrientation),getBotHeading());
                 break;
 
-            case EMERGENCYBRAKE:
+            case EMERGENCY_BRAKE:
                 this.drivetrain.lfMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
                 this.drivetrain.rfMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
                 this.drivetrain.rbMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);

@@ -16,8 +16,13 @@ public class Drivetrain {
 
     private final double DEFAULT_STANDARD_DRIVE_SPEED = 1;
     private final double DEFAULT_PRECISE_DRIVE_SPEED = 0.3;
+
+    private final double DEFAULT_TURNING_RATIO = 0;
+
     public double standardDriveSpeed = DEFAULT_STANDARD_DRIVE_SPEED;
     public double preciseDriveSpeed = DEFAULT_PRECISE_DRIVE_SPEED;
+
+    public double turningRatio = DEFAULT_TURNING_RATIO;
 
     public double speed;
 
@@ -51,7 +56,7 @@ public class Drivetrain {
      */
     public void runDrivetrainFromCartesian(Vector linear, double rx, double botHeading) {
         MotorMatrix motorMatrix = new MotorMatrix();
-        motorMatrix.setMotorMatrixFromCartesian(linear,rx,botHeading,speed);
+        motorMatrix.setMotorMatrixFromCartesian(linear,rx,botHeading,speed,turningRatio);
         lfMotor.setPower(motorMatrix.lf);
         rfMotor.setPower(motorMatrix.rf);
         lbMotor.setPower(motorMatrix.lb);

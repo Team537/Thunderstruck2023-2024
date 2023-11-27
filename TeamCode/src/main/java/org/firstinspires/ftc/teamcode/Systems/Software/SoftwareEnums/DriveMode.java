@@ -1,9 +1,9 @@
 package org.firstinspires.ftc.teamcode.Systems.Software.SoftwareEnums;
 
 public enum DriveMode {
-    AUTOSCORE,
-    MANUALDRIVE,
+    AUTO_SCORE,
+    MANUAL_DRIVE,
     ORIENT,
-    ERRORCORRECT,
-    EMERGENCYBRAKE,
+    ERROR_CORRECT,
+    EMERGENCY_BRAKE,
 }

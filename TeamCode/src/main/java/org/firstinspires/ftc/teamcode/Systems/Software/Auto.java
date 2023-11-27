@@ -147,7 +147,7 @@ public abstract class Auto extends LinearOpMode {
      * @param seconds number of seconds the robot will drive
      */
     public void linearDrive(Vector linear, double seconds) {
-        robot.setDriveMode(DriveMode.MANUALDRIVE);
+        robot.setDriveMode(DriveMode.MANUAL_DRIVE);
         robot.drivetrain.runDrivetrainFromCartesian(linear,0,robot.getBotHeading());
         robot.smartSleep(seconds);
         robot.drivetrain.stop();
@@ -162,7 +162,7 @@ public abstract class Auto extends LinearOpMode {
         robot.setTargetOrientation(targetOrientation);
         robot.setDriveMode(DriveMode.ORIENT);
         robot.smartSleep(seconds);
-        robot.setDriveMode(DriveMode.MANUALDRIVE);
+        robot.setDriveMode(DriveMode.MANUAL_DRIVE);
     }
 
     /**
@@ -235,6 +235,8 @@ public abstract class Auto extends LinearOpMode {
                 orient(1.5 * Math.PI,0.9);
                 linearDrive(new Vector(-0.5,0),0.9);
                 robot.dropPixel();
+                robot.smartSleep(1);
+                robot.stopDropping();
 
                 //dislodge pixel (may be stuck)
                 linearDrive(new Vector(0,0.5),0.3);
@@ -251,6 +253,8 @@ public abstract class Auto extends LinearOpMode {
                 //drop pixel on center spike mark
                 linearDrive(new Vector(0,0.5),0.9);
                 robot.dropPixel();
+                robot.smartSleep(1);
+                robot.stopDropping();
 
                 //dislodge pixel (may be stuck)
                 linearDrive(new Vector(0.5,0),0.3);
@@ -267,6 +271,8 @@ public abstract class Auto extends LinearOpMode {
                 orient(0.5 * Math.PI,0.9);
                 linearDrive(new Vector(0.5,0),0.9);
                 robot.dropPixel();
+                robot.smartSleep(1);
+                robot.stopDropping();
 
                 //dislodge pixel (may be stuck)
                 linearDrive(new Vector(0,-0.5),0.3);
