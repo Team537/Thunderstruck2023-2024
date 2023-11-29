@@ -78,7 +78,7 @@ public class Robot {
      * @return bot heading of the robot in radians
      */
     public double getBotHeading() {
-        return (-imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS) + angleOffset) % (2 * Math.PI);
+        return ((imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS) + angleOffset) % (2 * Math.PI) + (2 * Math.PI)) % (2 * Math.PI);
     }
 
     /**
@@ -105,7 +105,7 @@ public class Robot {
 
 
     public void setTargetOrientation(double angle) {
-        targetOrientation = angle % (2 * Math.PI);
+        targetOrientation = (angle % (2 * Math.PI) + (2 * Math.PI)) % (2 * Math.PI);
     }
 
     public double getTargetOrientation() {

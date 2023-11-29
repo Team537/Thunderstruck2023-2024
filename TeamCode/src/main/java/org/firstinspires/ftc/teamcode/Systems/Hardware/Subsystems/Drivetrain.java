@@ -24,7 +24,7 @@ public class Drivetrain {
 
     public double turningRatio = DEFAULT_TURNING_RATIO;
 
-    public double speed;
+    public double speed = standardDriveSpeed;
 
     public void setDriveSpeed(DriveSpeed driveSpeed) {
         switch (driveSpeed) {
@@ -55,8 +55,7 @@ public class Drivetrain {
      * @param botHeading the orientation of the robot
      */
     public void runDrivetrainFromCartesian(Vector linear, double rx, double botHeading) {
-        MotorMatrix motorMatrix = new MotorMatrix();
-        motorMatrix.setMotorMatrixFromCartesian(linear,rx,botHeading,speed,turningRatio);
+        MotorMatrix motorMatrix = MotorMatrix.setMotorMatrixFromCartesian(linear,rx,botHeading,speed,turningRatio);
         lfMotor.setPower(motorMatrix.lf);
         rfMotor.setPower(motorMatrix.rf);
         lbMotor.setPower(motorMatrix.lb);

@@ -462,19 +462,19 @@ public class Drive extends LinearOpMode {
             //Displays Committed Drive Mode
             switch (robot.driveMode) {
                 case MANUAL_DRIVE:
-                    telemetry.addData("Committed Drive Mode:","MANUAL DRIVE");
+                    telemetry.addData("Drive Mode:","MANUAL DRIVE");
                     break;
                 case AUTO_SCORE:
-                    telemetry.addData("Committed Drive Mode:","AUTO SCORE");
+                    telemetry.addData("Drive Mode:","AUTO SCORE");
                     break;
                 case ERROR_CORRECT:
-                    telemetry.addData("Committed Drive Mode:","ERROR CORRECT");
+                    telemetry.addData("Drive Mode:","ERROR CORRECT");
                     break;
                 case ORIENT:
-                    telemetry.addData("Committed Drive Mode:","ORIENT");
+                    telemetry.addData("Drive Mode:","ORIENT");
                     break;
                 case EMERGENCY_BRAKE:
-                    telemetry.addData("Committed Drive Mode:","EMERGENCY BRAKE");
+                    telemetry.addData("Drive Mode:","EMERGENCY BRAKE");
                     break;
             }
 

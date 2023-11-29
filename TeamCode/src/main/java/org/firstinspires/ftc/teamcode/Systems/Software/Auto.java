@@ -54,7 +54,7 @@ public abstract class Auto extends LinearOpMode {
         boolean endPositionState = false;
 
         //Init loop to swap between auto settings
-        while (!gamepad2.guide) {
+        while (!gamepad2.guide && !isStarted()) {
 
             //Toggle alliance on rising edge of a button
             if (gamepad2.a) {
