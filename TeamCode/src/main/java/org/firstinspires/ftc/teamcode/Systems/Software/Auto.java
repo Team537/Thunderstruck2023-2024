@@ -49,16 +49,16 @@ public abstract class Auto extends LinearOpMode {
         StartPosition startPosition = BACKSTAGE;
         EndPosition endPosition = CORNER;
 
-        boolean allianceState = false;
-        boolean startPositionState = false;
-        boolean endPositionState = false;
+        boolean allianceToggle = false;
+        boolean startPositionToggle = false;
+        boolean endPositionToggle = false;
 
         //Init loop to swap between auto settings
         while (!gamepad2.guide && !isStarted()) {
 
             //Toggle alliance on rising edge of a button
             if (gamepad2.a) {
-                if (!allianceState) {
+                if (!allianceToggle) {
                     switch (alliance) {
                         case RED:
                             alliance = BLUE;
@@ -68,14 +68,14 @@ public abstract class Auto extends LinearOpMode {
                             break;
                     }
                 }
-                allianceState = true;
+                allianceToggle = true;
             } else {
-                allianceState = false;
+                allianceToggle = false;
             }
 
             //Toggle start position on rising edge of b button
             if (gamepad2.b) {
-                if (!startPositionState) {
+                if (!startPositionToggle) {
                     switch (startPosition) {
                         case BACKSTAGE:
                             startPosition = FRONTSTAGE;
@@ -85,14 +85,14 @@ public abstract class Auto extends LinearOpMode {
                             break;
                     }
                 }
-                startPositionState = true;
+                startPositionToggle = true;
             } else {
-                startPositionState = false;
+                startPositionToggle = false;
             }
 
             //Toggle end position on rising edge of x button
             if (gamepad2.x) {
-                if (!endPositionState) {
+                if (!endPositionToggle) {
                     switch (endPosition) {
                         case CORNER:
                             endPosition = MIDDLE;
@@ -102,9 +102,9 @@ public abstract class Auto extends LinearOpMode {
                             break;
                     }
                 }
-                endPositionState = true;
+                endPositionToggle = true;
             } else {
-                endPositionState = false;
+                endPositionToggle = false;
             }
 
             //displaying alliance settings

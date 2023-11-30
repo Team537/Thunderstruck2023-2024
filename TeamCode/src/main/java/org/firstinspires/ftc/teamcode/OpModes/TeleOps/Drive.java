@@ -35,11 +35,11 @@ public class Drive extends LinearOpMode {
     boolean orientSetToggle = false;
 
     double secondsUpdate = 0;
-
     int updatesPerSecond = 0;
     int loopCounter = 0;
 
     Vector joystickOrient;
+    double target = 0;
 
     //creating a robot object, every input (ex. reading a sensor value) and output (ex. running a motor) is run through this class
     Robot robot = new Robot(this);
@@ -47,40 +47,10 @@ public class Drive extends LinearOpMode {
     @Override
     public void runOpMode() {
 
-        //Init loop to swap between auto settings
-        while ( !isStarted() ) {
-
-            //Toggle alliance on rising edge of a button
-            if (gamepad2.a) {
-                if (!allianceToggle) {
-                    switch (robot.alliance) {
-                        case RED:
-                            robot.alliance = Alliance.BLUE;
-                            break;
-                        case BLUE:
-                            robot.alliance = Alliance.RED;
-                            break;
-                    }
-                }
-                allianceToggle = true;
-            } else {
-                allianceToggle = false;
-            }
-
-            //displaying alliance settings
-            switch (robot.alliance) {
-                case RED:
-                    telemetry.addData("Alliance:","RED");
-                    break;
-                case BLUE:
-                telemetry.addData("Alliance:","BLUE");
-            }
-            telemetry.update();
-
-        }
-
         //this attaches actual functions to attributes found within the robot object
         robot.initializeRobot();
+
+        waitForStart();
 
         //loop that runs while the program is active
         while (opModeIsActive()) {
@@ -127,17 +97,15 @@ public class Drive extends LinearOpMode {
                             break;
                         case TARGET:
                             if (new Vector(rx,ry).magnitude() > 0.9) {
-                                turn = TargetTurn.getTurn(robot.getBotHeading(),new Vector(rx,ry).angle());
-                            } else {
-                                turn = 0;
+                                target = TargetTurn.getTurn(robot.getBotHeading(),new Vector(rx,ry).angle());
                             }
+                            turn = target;
                             break;
                         case TARGET_SNAP:
                             if (new Vector(rx,ry).magnitude() > 0.9) {
-                                turn = TargetTurn.getTurn(robot.getBotHeading(), (0.5 * Math.PI) * Math.round(new Vector(rx, ry).angle() / (0.5 * Math.PI)));
-                            } else {
-                                turn = 0;
+                                target = TargetTurn.getTurn(robot.getBotHeading(), (0.5 * Math.PI) * Math.round(new Vector(rx, ry).angle() / (0.5 * Math.PI)));
                             }
+                            turn = target;
                             break;
                     }
 
@@ -385,9 +353,11 @@ public class Drive extends LinearOpMode {
                             robot.turningMode = TurningMode.TARGET;
                             break;
                         case TARGET:
+                            target = robot.getBotHeading();
                             robot.turningMode = TurningMode.TARGET_SNAP;
                             break;
                         case TARGET_SNAP:
+                            target = (0.5 * Math.PI) * Math.round( robot.getBotHeading() / (0.5 * Math.PI) );
                             robot.turningMode = TurningMode.STANDARD;
                             break;
                     }
