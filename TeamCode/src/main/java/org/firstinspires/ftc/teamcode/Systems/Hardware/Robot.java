@@ -15,8 +15,11 @@ import org.firstinspires.ftc.teamcode.Systems.Hardware.Subsystems.Arm;
 import org.firstinspires.ftc.teamcode.Systems.Hardware.Subsystems.Drivetrain;
 import org.firstinspires.ftc.teamcode.Systems.Software.SoftwareEnums.Alliance;
 import org.firstinspires.ftc.teamcode.Systems.Software.SoftwareEnums.AutoScoringState;
+import org.firstinspires.ftc.teamcode.Systems.Software.SoftwareEnums.AutoStrategy;
+import org.firstinspires.ftc.teamcode.Systems.Software.SoftwareEnums.EndPosition;
 import org.firstinspires.ftc.teamcode.Systems.Software.SoftwareEnums.FieldOfReference;
 import org.firstinspires.ftc.teamcode.Systems.Software.SoftwareEnums.ScoringPosition;
+import org.firstinspires.ftc.teamcode.Systems.Software.SoftwareEnums.StartPosition;
 import org.firstinspires.ftc.teamcode.Systems.Software.SoftwareEnums.TurningMode;
 import org.firstinspires.ftc.teamcode.Utilities.TargetTurn;
 import org.firstinspires.ftc.teamcode.Utilities.Vector;
@@ -54,6 +57,9 @@ public class Robot {
     public ScoringPosition scoringPosition = ScoringPosition.CENTER;
     public FieldOfReference fieldOfReference = FieldOfReference.FIELD_CENTRIC;
     public TurningMode turningMode = TurningMode.STANDARD;
+    public StartPosition startPosition = StartPosition.BACKSTAGE;
+    public EndPosition endPosition = EndPosition.CORNER;
+    public AutoStrategy autoStrategy = AutoStrategy.SCORE;
 
     public final double TICKS_PER_INCH = 57.953;
 

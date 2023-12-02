@@ -21,7 +21,7 @@ public class Arm {
     private final double DEFAULT_ARM_DOWN_POWER = 0.8;
 
     private final double DEFAULT_WRIST_NEUTRAL_POSITION = 0.6;
-    private final double DEFAULT_WRIST_ACTIVE_POSITION = 0.4;
+    private final double DEFAULT_WRIST_ACTIVE_POSITION = 0.36;
 
     public int armUpPosition = DEFAULT_ARM_UP_POSITION;
     public double armUpPower = DEFAULT_ARM_UP_POWER;

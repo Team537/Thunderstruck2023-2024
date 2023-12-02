@@ -97,15 +97,15 @@ public class Drive extends LinearOpMode {
                             break;
                         case TARGET:
                             if (new Vector(rx,ry).magnitude() > 0.9) {
-                                target = TargetTurn.getTurn(robot.getBotHeading(),new Vector(rx,ry).angle());
+                                target = new Vector(rx,ry).angle();
                             }
-                            turn = target;
+                            turn = TargetTurn.getTurn(robot.getBotHeading(),target);;
                             break;
                         case TARGET_SNAP:
                             if (new Vector(rx,ry).magnitude() > 0.9) {
-                                target = TargetTurn.getTurn(robot.getBotHeading(), (0.5 * Math.PI) * Math.round(new Vector(rx, ry).angle() / (0.5 * Math.PI)));
+                                target = new Vector(rx,ry).angle();
                             }
-                            turn = target;
+                            turn = TargetTurn.getTurn(robot.getBotHeading(), (0.5 * Math.PI) * Math.round(target / (0.5 * Math.PI)));
                             break;
                     }
 
@@ -113,12 +113,12 @@ public class Drive extends LinearOpMode {
                     robot.drivetrain.runDrivetrainFromCartesian(new Vector(x,y),turn, (robot.fieldOfReference == FieldOfReference.FIELD_CENTRIC) ? robot.getBotHeading() : 0.5 * Math.PI );
 
                     //setting arm to go up when the left bumper is pressed
-                    if (gamepad1.x) {
+                    if (gamepad1.y) {
                         robot.arm.armUp();
                     }
 
                     //setting arm to go down when the right bumper is pressed
-                    if (gamepad1.y) {
+                    if (gamepad1.x) {
                         robot.arm.armDown();
                     }
 
@@ -173,7 +173,7 @@ public class Drive extends LinearOpMode {
                         robot.arm.armUpPosition += 1;
                     }
                     if (gamepad1.x) {
-                        robot.arm.armDownPosition -= 1;
+                        robot.arm.armUpPosition -= 1;
                     }
 
                     //manual changes to wrist orientations
