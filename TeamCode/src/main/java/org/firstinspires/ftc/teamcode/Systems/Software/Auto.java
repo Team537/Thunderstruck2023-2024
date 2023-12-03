@@ -215,12 +215,12 @@ public abstract class Auto extends LinearOpMode {
         waitForStart();
 
         //Drive forward to center of spike marks
-        linearDrive(new Vector(0,0.5),0.4);
+        linearDrive(new Vector(0,0.5),0.2);
 
         if (robot.autoStrategy == SCORE) {
 
             orient(0, 0.9);
-            linearDrive(new Vector(0, 0.5), 1.2);
+            linearDrive(new Vector(0, 0.5), 1.3);
 
             //detect the prop at the first position (searches for different color depending on alliance)
             if (robot.alliance == Alliance.RED) {
@@ -230,9 +230,9 @@ public abstract class Auto extends LinearOpMode {
             }
 
             //Rotate so robot is facing away from middle spike mark
-            linearDrive(new Vector(0, -0.5), 1.2);
+            linearDrive(new Vector(0, -0.5), 1.3);
             orient(1.5 * Math.PI, 0.9);
-            linearDrive(new Vector(0, 0.5), 1.2);
+            linearDrive(new Vector(0, 0.5), 1.3);
 
             //detect the prop at the second position (searches for different color depending on alliance)
             if (robot.alliance == Alliance.RED) {
@@ -242,9 +242,9 @@ public abstract class Auto extends LinearOpMode {
             }
 
             //Rotate so robot is facing away from right spike mark
-            linearDrive(new Vector(0, -0.5), 1.2);
+            linearDrive(new Vector(0, -0.5), 1.3);
             orient(Math.PI, 0.9);
-            linearDrive(new Vector(0, 0.5), 1.2);
+            linearDrive(new Vector(0, 0.5), 1.3);
 
             //detect the prop at the third position (searches for different color depending on alliance)
             if (robot.alliance == Alliance.RED) {
@@ -322,7 +322,7 @@ public abstract class Auto extends LinearOpMode {
             }
 
             //Rotate so robot is facing away from right spike mark
-            linearDrive(new Vector(0, -0.5), 1.2);
+            linearDrive(new Vector(0, -0.5), 1.3);
         }
 
         orient((robot.alliance == Alliance.RED) ? Math.PI:0,0.9);
@@ -331,11 +331,11 @@ public abstract class Auto extends LinearOpMode {
         switch (robot.startPosition) {
             case BACKSTAGE:
                 linearDrive(new Vector((robot.alliance == Alliance.RED) ? 0.5:-0.5, 0),2.5);
-                linearDrive(new Vector(0,0.5),1.2);
+                linearDrive(new Vector(0,0.5),1.3);
                 break;
             case FRONTSTAGE:
                 linearDrive(new Vector((robot.alliance == Alliance.RED) ? 0.5:-0.5, 0),5);
-                linearDrive(new Vector(0,0.5),1.2);
+                linearDrive(new Vector(0,0.5),1.3);
                 break;
         }
 

@@ -188,19 +188,19 @@ public class Robot {
             case AUTO_SCORE:
                 autoScoringState = AutoScoringState.ORIENT;
                 this.arm.shoulder.setPower(1);
-                this.drivetrain.lfMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
-                this.drivetrain.rfMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
-                this.drivetrain.rbMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
-                this.drivetrain.lbMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+                this.drivetrain.lfMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+                this.drivetrain.rfMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+                this.drivetrain.rbMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+                this.drivetrain.lbMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
                 break;
             case MANUAL_DRIVE:
             case ORIENT:
                 //in case the power was changed via emergency brake, set power back on for the shoulder
                 this.arm.shoulder.setPower(1);
-                this.drivetrain.lfMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
-                this.drivetrain.rfMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
-                this.drivetrain.rbMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
-                this.drivetrain.lbMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+                this.drivetrain.lfMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+                this.drivetrain.rfMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+                this.drivetrain.rbMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+                this.drivetrain.lbMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
                 break;
         }
 
@@ -230,11 +230,12 @@ public class Robot {
         Vector rbVector = Vector.rotate( Vector.multiply( new Vector(Math.sqrt(2) / 2, -Math.sqrt(2) / 2), rbPosition - lastRBPosition ), angle);
         Vector lbVector = Vector.rotate( Vector.multiply( new Vector(Math.sqrt(2) / 2, Math.sqrt(2) / 2), lbPosition - lastLBPosition ), angle);
         Vector totalVector = Vector.add( Vector.add(lfVector,rfVector), Vector.add(rbVector,lbVector) );
-        position = Vector.add(position,totalVector);
+        position = Vector.add(position,Vector.divide(totalVector,TICKS_PER_INCH));
         lastLFPosition = lfPosition;
         lastRFPosition = rfPosition;
         lastRBPosition = rbPosition;
         lastLBPosition = lbPosition;
+
 
         switch(this.driveMode) {
 

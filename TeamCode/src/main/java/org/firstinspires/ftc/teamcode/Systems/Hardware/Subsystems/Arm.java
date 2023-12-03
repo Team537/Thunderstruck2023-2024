@@ -39,7 +39,7 @@ public class Arm {
 
     public void discharge() {
         claw.setPower(1);
-        wrist.setPosition(wristActivePosition);
+        wrist.setPosition(wristNeutralPosition);
     }
 
     public void stopClaw() {
