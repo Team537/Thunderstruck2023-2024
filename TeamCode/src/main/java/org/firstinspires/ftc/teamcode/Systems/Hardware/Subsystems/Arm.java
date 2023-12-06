@@ -5,6 +5,7 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.teamcode.Utilities.MotorMatrix;
+import org.firstinspires.ftc.teamcode.Utilities.PID;
 import org.firstinspires.ftc.teamcode.Utilities.Vector;
 
 public class Arm {
@@ -14,8 +15,10 @@ public class Arm {
     public Servo wrist;
     public CRServo claw;
 
+    boolean armUp = false;
+
     //easy to change variables
-    private final int DEFAULT_ARM_UP_POSITION = -240;
+    private final int DEFAULT_ARM_UP_POSITION = -220;
     private final double DEFAULT_ARM_UP_POWER = 1.0;
     private final int DEFAULT_ARM_DOWN_POSITION = 0;
     private final double DEFAULT_ARM_DOWN_POWER = 0.8;
@@ -31,6 +34,10 @@ public class Arm {
     public double wristNeutralPosition = DEFAULT_WRIST_NEUTRAL_POSITION;
     public double wristActivePosition = DEFAULT_WRIST_ACTIVE_POSITION;
 
+    public PID armPID = new PID(0.01,0.0,0.01,0.05);
+
+    public double error;
+    public double feedForward;
 
     public void intake() {
         claw.setPower(-1);
@@ -48,13 +55,17 @@ public class Arm {
     }
 
     public void armUp() {
-        shoulder.setTargetPosition(armUpPosition);
-        shoulder.setPower(armUpPower);
+        armPID.setTarget(armUpPosition,armUpPosition - shoulder.getCurrentPosition());
     }
 
     public void armDown() {
-        shoulder.setTargetPosition(armDownPosition);
-        shoulder.setPower(armDownPower);
+        armPID.setTarget(armDownPosition,armDownPosition - shoulder.getCurrentPosition());
+    }
+
+    public void updateArm() {
+        error = armPID.getTarget() - shoulder.getCurrentPosition();
+        feedForward = Math.signum(error);//0.5 * Math.signum(error) - 0.5 * Math.cos( (armPID.getTarget() - 70) * (Math.PI/300) );
+        shoulder.setPower(armPID.calculate(error,feedForward));
     }
 
 }

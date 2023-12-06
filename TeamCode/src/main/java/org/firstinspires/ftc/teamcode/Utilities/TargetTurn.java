@@ -16,4 +16,10 @@ public class TargetTurn {
         }
     }
 
+    public static double getDistance(double orientation,double target) {
+        Vector orientationVector = Vector.fromPolar(1,orientation);
+        Vector targetVector = Vector.fromPolar(1,target);
+        return Vector.cross(orientationVector, targetVector);
+    }
+
 }

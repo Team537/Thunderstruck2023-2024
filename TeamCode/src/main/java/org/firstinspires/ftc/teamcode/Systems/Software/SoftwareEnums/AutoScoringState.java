@@ -1,9 +1,12 @@
 package org.firstinspires.ftc.teamcode.Systems.Software.SoftwareEnums;
 
 public enum AutoScoringState {
+    BEGIN,
     ORIENT,
     ALIGN,
     POSITION,
-    ARM,
     SCORE,
+    DISCHARGE,
+    FALL,
+    END,
 }

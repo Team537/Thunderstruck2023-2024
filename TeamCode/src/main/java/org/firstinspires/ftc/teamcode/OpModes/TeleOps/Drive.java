@@ -312,9 +312,9 @@ public class Drive extends LinearOpMode {
                 if (!scoringPositionToggle) {
                     switch (robot.scoringPosition) {
                         case LEFT:
-                            robot.scoringPosition = ScoringPosition.CENTER;
+                            robot.scoringPosition = ScoringPosition.MIDDLE;
                             break;
-                        case CENTER:
+                        case MIDDLE:
                             robot.scoringPosition = ScoringPosition.RIGHT;
                             break;
                         case RIGHT:
@@ -369,16 +369,16 @@ public class Drive extends LinearOpMode {
 
             //drive mode quick selects (both operator and driver can use these)
             if ( (gamepad2.dpad_up || gamepad1.dpad_up) && robot.getDriveMode() != DriveMode.MANUAL_DRIVE) {
-                robot.driveMode = DriveMode.MANUAL_DRIVE;
+                robot.setDriveMode(DriveMode.MANUAL_DRIVE);
             }
-            if ( (gamepad2.dpad_left || gamepad1.dpad_left) && robot.getDriveMode() != DriveMode.AUTO_SCORE) {
-                robot.driveMode = DriveMode.AUTO_SCORE;
+            if ( (gamepad2.dpad_left || gamepad1.dpad_left) && robot.getDriveMode() != DriveMode.AUTO_OP) {
+                robot.setDriveMode(DriveMode.AUTO_OP);
             }
             if ( (gamepad2.dpad_right || gamepad1.dpad_right) && robot.getDriveMode() != DriveMode.ORIENT) {
-                robot.driveMode = DriveMode.ORIENT;
+                robot.setDriveMode(DriveMode.ORIENT);
             }
             if ( (gamepad2.dpad_down || gamepad1.dpad_down) && robot.getDriveMode() != DriveMode.ERROR_CORRECT) {
-                robot.driveMode = DriveMode.ERROR_CORRECT;
+                robot.setDriveMode(DriveMode.ERROR_CORRECT);
             }
 
             //Displays Alliance
@@ -395,7 +395,7 @@ public class Drive extends LinearOpMode {
                 case LEFT:
                     telemetry.addData("Scoring Position:","LEFT");
                     break;
-                case CENTER:
+                case MIDDLE:
                     telemetry.addData("Scoring Position:","CENTER");
                     break;
                 case RIGHT:
@@ -434,8 +434,8 @@ public class Drive extends LinearOpMode {
                 case MANUAL_DRIVE:
                     telemetry.addData("Drive Mode:","MANUAL DRIVE");
                     break;
-                case AUTO_SCORE:
-                    telemetry.addData("Drive Mode:","AUTO SCORE");
+                case AUTO_OP:
+                    telemetry.addData("Drive Mode:","AUTO OP");
                     break;
                 case ERROR_CORRECT:
                     telemetry.addData("Drive Mode:","ERROR CORRECT");
@@ -459,6 +459,8 @@ public class Drive extends LinearOpMode {
                 telemetry.addData("Standard Drive Speed:",robot.drivetrain.standardDriveSpeed);
                 telemetry.addData("Precise Drive Speed:",robot.drivetrain.preciseDriveSpeed);
             }
+
+            telemetry.addData("arm power",robot.arm.shoulder.getPower());
 
             telemetry.update();
         }
