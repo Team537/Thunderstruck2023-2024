@@ -18,12 +18,12 @@ public class Arm {
     boolean armUp = false;
 
     //easy to change variables
-    private final int DEFAULT_ARM_UP_POSITION = -220;
+    private final int DEFAULT_ARM_UP_POSITION = -230;
     private final double DEFAULT_ARM_UP_POWER = 1.0;
     private final int DEFAULT_ARM_DOWN_POSITION = 0;
     private final double DEFAULT_ARM_DOWN_POWER = 0.8;
 
-    private final double DEFAULT_WRIST_NEUTRAL_POSITION = 0.6;
+    private final double DEFAULT_WRIST_NEUTRAL_POSITION = 0.55;//0.6;
     private final double DEFAULT_WRIST_ACTIVE_POSITION = 0.36;
 
     public int armUpPosition = DEFAULT_ARM_UP_POSITION;

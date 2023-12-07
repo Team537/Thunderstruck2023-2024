@@ -44,7 +44,6 @@ public class Robot {
     public Arm arm = new Arm();
     public Servo launcher;
     public CRServo dropper;
-    public ColorSensor colorSensor;
 
     public AprilTagProcessor tagProcessor;
     public VisionPortal visionPortal;
@@ -178,9 +177,6 @@ public class Robot {
         arm.claw.setPower(0);
         launcher.setPosition(1);
         dropper.setPower(0);
-
-        //attaching color sensor
-        colorSensor = opMode.hardwareMap.get(ColorSensor.class,"color_sensor");
 
         tagProcessor = new AprilTagProcessor.Builder()
                 .setDrawAxes(true)

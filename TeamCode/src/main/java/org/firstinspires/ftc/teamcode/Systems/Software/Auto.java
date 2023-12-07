@@ -224,9 +224,9 @@ public abstract class Auto extends LinearOpMode {
 
             //detect the prop at the first position (searches for different color depending on alliance)
             if (robot.alliance == Alliance.RED) {
-                colorMatrix[0] = robot.colorSensor.red();
+                //colorMatrix[0] = robot.colorSensor.red();
             } else {
-                colorMatrix[0] = robot.colorSensor.blue();
+                //colorMatrix[0] = robot.colorSensor.blue();
             }
 
             //Rotate so robot is facing away from middle spike mark
@@ -236,9 +236,9 @@ public abstract class Auto extends LinearOpMode {
 
             //detect the prop at the second position (searches for different color depending on alliance)
             if (robot.alliance == Alliance.RED) {
-                colorMatrix[1] = robot.colorSensor.red();
+                //colorMatrix[1] = robot.colorSensor.red();
             } else {
-                colorMatrix[1] = robot.colorSensor.blue();
+                //colorMatrix[1] = robot.colorSensor.blue();
             }
 
             //Rotate so robot is facing away from right spike mark
@@ -248,9 +248,9 @@ public abstract class Auto extends LinearOpMode {
 
             //detect the prop at the third position (searches for different color depending on alliance)
             if (robot.alliance == Alliance.RED) {
-                colorMatrix[2] = robot.colorSensor.red();
+                //colorMatrix[2] = robot.colorSensor.red();
             } else {
-                colorMatrix[2] = robot.colorSensor.blue();
+                //colorMatrix[2] = robot.colorSensor.blue();
             }
 
             telemetry.addLine(Integer.toString(colorMatrix[0]));

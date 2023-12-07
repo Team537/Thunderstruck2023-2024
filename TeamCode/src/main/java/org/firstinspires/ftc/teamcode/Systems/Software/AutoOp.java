@@ -49,7 +49,7 @@ public class AutoOp {
         }
 
         //setting the arm up and marking the timestamp
-        //robot.arm.armUp();
+        robot.arm.armUp();
         armUpTimestamp = robot.runtime.seconds();
 
     }
@@ -80,14 +80,14 @@ public class AutoOp {
             if (foundPrimary) {
 
                 //finishes state if it detects the right tag in the right spot
-                if (Math.abs(tagOffset.x) < 0.3 && tagOffset.y < 5) {
+                if (Math.abs(tagOffset.x) < 0.3 && tagOffset.y < 8) {
                     robot.drivetrain.stop();
                     return true;
                 }
 
                 //changes wait times depending on if it has aligned itself correctly
                 if (Math.abs(tagOffset.x) < 0.3) {
-                    maxTagWaitTime = Math.min(0.5, Math.min(Math.abs(tagOffset.x)/30,tagOffset.y/10));
+                    maxTagWaitTime = Math.min(0.5, Math.min(Math.abs(tagOffset.x)/30,tagOffset.y/20));
                 } else {
                     maxTagWaitTime = Math.min(0.5, tagOffset.y/10);
                 }
