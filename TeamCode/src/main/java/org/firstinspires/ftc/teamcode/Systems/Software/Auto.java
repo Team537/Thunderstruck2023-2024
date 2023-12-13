@@ -11,16 +11,20 @@ import static org.firstinspires.ftc.teamcode.Systems.Software.SoftwareEnums.Star
 
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import org.firstinspires.ftc.robotcore.external.tfod.Recognition;
 import org.firstinspires.ftc.teamcode.Systems.Software.SoftwareEnums.Alliance;
 import org.firstinspires.ftc.teamcode.Systems.Software.SoftwareEnums.AutoStrategy;
 import org.firstinspires.ftc.teamcode.Systems.Software.SoftwareEnums.DriveMode;
 import org.firstinspires.ftc.teamcode.Systems.Software.SoftwareEnums.EndPosition;
 import org.firstinspires.ftc.teamcode.Systems.Software.SoftwareEnums.PropPosition;
+import org.firstinspires.ftc.teamcode.Systems.Software.SoftwareEnums.ScoringPosition;
 import org.firstinspires.ftc.teamcode.Systems.Software.SoftwareEnums.StartPosition;
 import org.firstinspires.ftc.teamcode.Systems.Hardware.Robot;
 import org.firstinspires.ftc.teamcode.Utilities.Vector;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+
+import java.util.List;
 
 public abstract class Auto extends LinearOpMode {
 
@@ -166,6 +170,7 @@ public abstract class Auto extends LinearOpMode {
                     break;
                 case PARK:
                     telemetry.addData("Auto Strategy:","PARK");
+                    break;
             }
 
             telemetry.update();
@@ -199,6 +204,8 @@ public abstract class Auto extends LinearOpMode {
         robot.setDriveMode(DriveMode.MANUAL_DRIVE);
     }
 
+    public List<Recognition> recognitions;
+
     /**
      * runs the autonomous code
      */
@@ -215,165 +222,228 @@ public abstract class Auto extends LinearOpMode {
         waitForStart();
 
         //Drive forward to center of spike marks
-        linearDrive(new Vector(0,0.5),0.2);
+        linearDrive(new Vector(0,0.5),0.3);
 
         if (robot.autoStrategy == SCORE) {
 
-            orient(0, 0.9);
-            linearDrive(new Vector(0, 0.5), 1.3);
+            orient(1.65 * Math.PI, 1.5);
 
             //detect the prop at the first position (searches for different color depending on alliance)
-            if (robot.alliance == Alliance.RED) {
-                //colorMatrix[0] = robot.colorSensor.red();
-            } else {
-                //colorMatrix[0] = robot.colorSensor.blue();
+            for (int i = 0; i < 10; i++) {
+                robot.smartSleep(0.05);
+                if (robot.alliance == Alliance.RED) {
+                    recognitions = robot.tensorFlow.getFreshRecognitions();
+                    if (recognitions != null) {
+                        if (recognitions.size() > 0) {
+                            for (Recognition recognition : recognitions) {
+                                if (recognition.getLabel() == "RedTeamProp") {
+                                    propPosition = PropPosition.LEFT;
+                                }
+                            }
+                        }
+                    }
+                } else {
+                    recognitions = robot.tensorFlow.getFreshRecognitions();
+                    if (recognitions != null) {
+                        if (recognitions.size() > 0) {
+                            for (Recognition recognition : recognitions) {
+                                if (recognition.getLabel() == "BlueTeamProp") {
+                                    propPosition = PropPosition.LEFT;
+                                }
+                            }
+                        }
+                    }
+                }
             }
 
-            //Rotate so robot is facing away from middle spike mark
-            linearDrive(new Vector(0, -0.5), 1.3);
-            orient(1.5 * Math.PI, 0.9);
-            linearDrive(new Vector(0, 0.5), 1.3);
+            if (propPosition == PropPosition.LEFT) {
+                robot.opMode.telemetry.addData("it worked","yessir");
+                telemetry.update();
+            }
+
+            orient(1.5 * Math.PI, 0.3);
 
             //detect the prop at the second position (searches for different color depending on alliance)
-            if (robot.alliance == Alliance.RED) {
-                //colorMatrix[1] = robot.colorSensor.red();
-            } else {
-                //colorMatrix[1] = robot.colorSensor.blue();
+            for (int i = 0; i < 10; i++) {
+                robot.smartSleep(0.05);
+                if (robot.alliance == Alliance.RED) {
+                    recognitions = robot.tensorFlow.getFreshRecognitions();
+                    if (recognitions != null) {
+                        if (recognitions.size() > 0) {
+                            for (Recognition recognition : recognitions) {
+                                if (recognition.getLabel() == "RedTeamProp") {
+                                    propPosition = PropPosition.MIDDLE;
+                                }
+                            }
+                        }
+                    }
+                } else {
+                    recognitions = robot.tensorFlow.getFreshRecognitions();
+                    if (recognitions != null) {
+                        if (recognitions.size() > 0) {
+                            for (Recognition recognition : recognitions) {
+                                if (recognition.getLabel() == "BlueTeamProp") {
+                                    propPosition = PropPosition.MIDDLE;
+                                }
+                            }
+                        }
+                    }
+                }
             }
 
             //Rotate so robot is facing away from right spike mark
-            linearDrive(new Vector(0, -0.5), 1.3);
-            orient(Math.PI, 0.9);
-            linearDrive(new Vector(0, 0.5), 1.3);
+            orient(1.35 * Math.PI, 0.3);
 
             //detect the prop at the third position (searches for different color depending on alliance)
-            if (robot.alliance == Alliance.RED) {
-                //colorMatrix[2] = robot.colorSensor.red();
-            } else {
-                //colorMatrix[2] = robot.colorSensor.blue();
+            for (int i = 0; i < 10; i++){
+                robot.smartSleep(0.05);
+                if (robot.alliance == Alliance.RED) {
+                    recognitions = robot.tensorFlow.getFreshRecognitions();
+                    if (recognitions != null) {
+                        if (recognitions.size() > 0) {
+                            for (Recognition recognition : recognitions) {
+                                if (recognition.getLabel() == "RedTeamProp") {
+                                    propPosition = PropPosition.RIGHT;
+                                }
+                            }
+                        }
+                    }
+                } else {
+                    recognitions = robot.tensorFlow.getFreshRecognitions();
+                    if (recognitions != null) {
+                        if (recognitions.size() > 0) {
+                            for (Recognition recognition : recognitions) {
+                                if (recognition.getLabel() == "BlueTeamProp") {
+                                    propPosition = PropPosition.RIGHT;
+                                }
+                            }
+                        }
+                    }
+                }
             }
+
+            orient(1.5 * Math.PI, 0.3);
+            linearDrive(new Vector(0, 0.5), 1.6);
 
             telemetry.addLine(Integer.toString(colorMatrix[0]));
             telemetry.addLine(Integer.toString(colorMatrix[1]));
             telemetry.addLine(Integer.toString(colorMatrix[2]));
             telemetry.update();
 
-            if (colorMatrix[0] >= colorMatrix[1] && colorMatrix[0] >= colorMatrix[2]) {
-                propPosition = PropPosition.LEFT;
-            }
-            if (colorMatrix[1] >= colorMatrix[2] && colorMatrix[1] >= colorMatrix[0]) {
-                propPosition = PropPosition.MIDDLE;
-            }
-            if (colorMatrix[2] >= colorMatrix[0] && colorMatrix[2] >= colorMatrix[1]) {
-                propPosition = PropPosition.RIGHT;
-            }
-
             //score differently depending on where the prop was detected
             switch (propPosition) {
                 case LEFT:
 
                     //drop pixel on left spike mark
-                    orient(1.5 * Math.PI, 0.9);
-                    linearDrive(new Vector(-0.5, 0), 0.9);
+                    linearDrive(new Vector(-1, 0), 0.6);
                     robot.dropPixel();
                     robot.smartSleep(1);
                     robot.stopDropping();
 
                     //dislodge pixel (may be stuck)
-                    linearDrive(new Vector(0, 0.5), 0.3);
-                    linearDrive(new Vector(0, -0.5), 0.3);
+                    linearDrive(new Vector(0, 0.5), 0.2);
+                    linearDrive(new Vector(0, -0.5), 0.2);
 
                     //drive back to center
-                    linearDrive(new Vector(0.5, 0), 0.9);
+                    linearDrive(new Vector(1, 0), 0.6);
+                    linearDrive(new Vector(0, -0.5), 1.6);
                     break;
 
                 case MIDDLE:
 
                     //drop pixel on center spike mark
-                    linearDrive(new Vector(0, 0.5), 0.9);
+                    orient(0, 1);
+                    linearDrive(new Vector(0.1, 1), 0.2);
                     robot.dropPixel();
                     robot.smartSleep(1);
                     robot.stopDropping();
 
                     //dislodge pixel (may be stuck)
-                    linearDrive(new Vector(0.5, 0), 0.3);
-                    linearDrive(new Vector(-0.5, 0), 0.3);
+                    linearDrive(new Vector(0.5, 0), 0.2);
+                    linearDrive(new Vector(-0.5, 0), 0.2);
 
                     //drive back to center
-                    linearDrive(new Vector(0, -0.5), 0.9);
+                    linearDrive(new Vector(0, -1), 0.2);
+                    linearDrive(new Vector(0, -0.5), 1.6);
                     break;
 
                 case RIGHT:
 
                     //drop pixel on right spike mark
-                    orient(0.5 * Math.PI, 0.9);
-                    linearDrive(new Vector(0.5, 0), 0.9);
+                    orient(0.5 * Math.PI, 1);
+                    linearDrive(new Vector(1, 0), 0.6);
                     robot.dropPixel();
                     robot.smartSleep(1);
                     robot.stopDropping();
 
                     //dislodge pixel (may be stuck)
-                    linearDrive(new Vector(0, -0.5), 0.3);
-                    linearDrive(new Vector(0, 0.5), 0.3);
+                    linearDrive(new Vector(0, -0.5), 0.2);
+                    linearDrive(new Vector(0, 0.5), 0.2);
 
                     //drive back to center
-                    linearDrive(new Vector(-0.5, 0), 0.9);
+                    linearDrive(new Vector(-1, 0), 0.6);
+                    linearDrive(new Vector(0, -0.5), 1.6);
                     break;
             }
 
-            //Rotate so robot is facing away from right spike mark
-            linearDrive(new Vector(0, -0.5), 1.3);
         }
 
-        orient((robot.alliance == Alliance.RED) ? Math.PI:0,0.9);
+        linearDrive(new Vector(0,0.5),0.3);
+        orient((robot.alliance == Alliance.RED) ? Math.PI:0,1.2);
 
         //drives to the board (different depending on start position)
         switch (robot.startPosition) {
             case BACKSTAGE:
-                linearDrive(new Vector((robot.alliance == Alliance.RED) ? 0.5:-0.5, 0),2.5);
-                linearDrive(new Vector(0,0.5),1.3);
+                linearDrive(new Vector((robot.alliance == Alliance.RED) ? 1:-1, 0),1);
+                linearDrive(new Vector(0,1),0.7);
                 break;
             case FRONTSTAGE:
-                linearDrive(new Vector((robot.alliance == Alliance.RED) ? 0.5:-0.5, 0),5);
-                linearDrive(new Vector(0,0.5),1.3);
+                linearDrive(new Vector((robot.alliance == Alliance.RED) ? 1:-1, 0),1.9);
+                linearDrive(new Vector(0,1),0.7);
                 break;
         }
 
         if (robot.autoStrategy == SCORE) {
 
-            //makes robot raise arm
-            robot.arm.armUp();
-            robot.smartSleep(5);
-
             //moves drivetrain to right position for scoring
             switch (propPosition) {
 
                 case LEFT:
-                    linearDrive(new Vector(0, (robot.alliance == Alliance.RED) ? 0.5 : -0.5), 0.3);
+                    robot.scoringPosition = ScoringPosition.LEFT;
+                    break;
+
+                case MIDDLE:
+                    robot.scoringPosition = ScoringPosition.MIDDLE;
                     break;
 
                 case RIGHT:
-                    linearDrive(new Vector(0, (robot.alliance == Alliance.RED) ? -0.5 : 0.5), 0.3);
+                    robot.scoringPosition = ScoringPosition.RIGHT;
                     break;
 
             }
 
-            //drops pre-loaded pixel and lowers arm
-            robot.arm.discharge();
-            robot.smartSleep(1);
+            robot.setDriveMode(DriveMode.AUTO_OP);
+
+            robot.smartSleep(10);
+
+            robot.setDriveMode(DriveMode.MANUAL_DRIVE);
+
             robot.arm.stopClaw();
             robot.arm.armDown();
-            robot.smartSleep(2);
 
             //re-centers robot
             switch (propPosition) {
 
                 case LEFT:
-                    linearDrive(new Vector(0, (robot.alliance == Alliance.RED) ? -0.5 : 0.5), 0.3);
+                    linearDrive(new Vector((robot.alliance == Alliance.RED) ? -0.5 : 0.5, (robot.alliance == Alliance.RED) ? -0.5 : 0.5), 0.3);
+                    break;
+
+                case MIDDLE:
+                    linearDrive(new Vector((robot.alliance == Alliance.RED) ? -0.5 : 0.5, 0), 0.3);
                     break;
 
                 case RIGHT:
-                    linearDrive(new Vector(0, (robot.alliance == Alliance.RED) ? 0.5 : -0.5), 0.3);
+                    linearDrive(new Vector((robot.alliance == Alliance.RED) ? -0.5 : 0.5, (robot.alliance == Alliance.RED) ? 0.5 : -0.5), 0.3);
                     break;
 
             }
@@ -381,21 +451,20 @@ public abstract class Auto extends LinearOpMode {
         }
 
         //orients so field centric is correct upon TeleOp
-        orient(0.5 * Math.PI,2);
+        orient(0.5 * Math.PI,0.9);
 
         //splits depending on target end position
         switch (robot.endPosition) {
             case CORNER:
-                linearDrive(new Vector(0,-0.5),1.8);
+                linearDrive(new Vector(0,-1),0.9);
                 break;
             case MIDDLE:
-                linearDrive(new Vector(0,0.5),1.8);
+                linearDrive(new Vector(0,1),1);
                 break;
         }
 
         //drives into corner and reorients servo
-        linearDrive(new Vector((robot.alliance == Alliance.RED) ? 0.5:-0.5,0),1.2);
-        robot.arm.wrist.setPosition(0.5);
+        linearDrive(new Vector((robot.alliance == Alliance.RED) ? 1:-1,0),0.6);
 
     }
 

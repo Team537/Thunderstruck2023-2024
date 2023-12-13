@@ -41,7 +41,7 @@ public class AutoOp {
                 primaryTagID = (robot.alliance == Alliance.BLUE) ? 1 : 4;
                 break;
             case MIDDLE:
-                primaryTagID = (robot.alliance == Alliance.BLUE) ? 2 : 4;
+                primaryTagID = (robot.alliance == Alliance.BLUE) ? 2 : 5;
                 break;
             case RIGHT:
                 primaryTagID = (robot.alliance == Alliance.BLUE) ? 3 : 6;
@@ -57,7 +57,9 @@ public class AutoOp {
         robot.drivetrain.runDrivetrainFromCartesian(new Vector(0,0),turn,1.5 * Math.PI);
         if ( Math.abs( turn ) < 0.05) {
             robot.drivetrain.stop();
-            return true;
+            if (robot.arm.shoulder.getCurrentPosition() < -200) {
+                return true;
+            }
         }
         return false;
     }
@@ -80,50 +82,50 @@ public class AutoOp {
             if (foundPrimary) {
 
                 //finishes state if it detects the right tag in the right spot
-                if (Math.abs(tagOffset.x) < 0.3 && tagOffset.y < 8) {
+                if (Math.abs(tagOffset.x) < 0.3 && tagOffset.y < 10) {
                     robot.drivetrain.stop();
                     return true;
                 }
 
                 //changes wait times depending on if it has aligned itself correctly
                 if (Math.abs(tagOffset.x) < 0.3) {
-                    maxTagWaitTime = Math.min(0.5, Math.min(Math.abs(tagOffset.x)/30,tagOffset.y/20));
+                    maxTagWaitTime = Math.min(0.3, Math.min(Math.abs(tagOffset.x)/30,tagOffset.y/30));
                 } else {
-                    maxTagWaitTime = Math.min(0.5, tagOffset.y/10);
+                    maxTagWaitTime = Math.min(0.3, tagOffset.y/10);
                 }
 
                 //drives closer to tag
                 if (tagOffset.y < 5) {
                     linear.y = 0;
                 } else {
-                    linear.y = 0.5; //0.3
+                    linear.y = 0.3; //0.3
                 }
 
                 //aligns left or right
                 if (tagOffset.x > 0.3) {
-                    linear.x = 0.3; //0.15
+                    linear.x = 0.15; //0.15
                 } else if (tagOffset.x < -0.3) {
-                    linear.x = -0.3; //-0.15
+                    linear.x = -0.15; //-0.15
                 } else {
                     linear.x = 0;
                 }
 
             } else {
 
-                maxTagWaitTime = 0.5;
+                maxTagWaitTime = 0.4;
 
                 //drives backwards for more visibility
                 if (tagOffset.y > 40) {
                     linear.y = 0;
                 } else {
-                    linear.y = -0.2; //-0.15
+                    linear.y = -0.15; //-0.15
                 }
 
                 //drives left or right depending on if the id is less than or greater than the primary one
                 if (tagID > primaryTagID) {
-                    linear.x = -0.6; //0.3
+                    linear.x = -0.4; //0.3
                 } else {
-                    linear.x = 0.6; //0.3
+                    linear.x = 0.4; //0.3
                 }
 
             }
@@ -132,7 +134,11 @@ public class AutoOp {
 
         //stops drivetrain if it hasn't detected a tag in a while
         if (robot.runtime.seconds() > lastTagFoundTimestamp + maxTagWaitTime) {
-            linear = new Vector(0,0);
+            if (robot.runtime.seconds() > lastTagFoundTimestamp + maxTagWaitTime + 1) {
+                linear = new Vector(0,-0.2);
+            } else {
+                linear = new Vector(0,0);
+            }
         }
 
         //updates drivetrain
@@ -146,12 +152,10 @@ public class AutoOp {
         positionTimestamp = robot.runtime.seconds();
     }
     private boolean position(double turn) {
-        robot.drivetrain.runDrivetrainFromCartesian(new Vector(0,0.3),turn,1.5 * Math.PI);
-        if (robot.runtime.seconds() > positionTimestamp + 1) {
+        robot.drivetrain.runDrivetrainFromCartesian(new Vector(0,0.2),turn,1.5 * Math.PI);
+        if (robot.runtime.seconds() > positionTimestamp + (tagOffset.y / 6)) {
             robot.drivetrain.stop();
-            if (robot.runtime.seconds() > armUpTimestamp + 3) {
-                return true;
-            }
+            return true;
         }
         return false;
     }
@@ -196,7 +200,7 @@ public class AutoOp {
                         useTag = true;
                     }
                 } else {
-                    if (tag.id == 3 || tag.id == 4 || tag.id == 6) {
+                    if (tag.id == 4 || tag.id == 5 || tag.id == 6) {
                         useTag = true;
                     }
                 }

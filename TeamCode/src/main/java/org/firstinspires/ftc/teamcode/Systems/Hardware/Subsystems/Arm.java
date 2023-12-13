@@ -18,7 +18,7 @@ public class Arm {
     boolean armUp = false;
 
     //easy to change variables
-    private final int DEFAULT_ARM_UP_POSITION = -230;
+    private final int DEFAULT_ARM_UP_POSITION = -240;
     private final double DEFAULT_ARM_UP_POWER = 1.0;
     private final int DEFAULT_ARM_DOWN_POSITION = 0;
     private final double DEFAULT_ARM_DOWN_POWER = 0.8;

@@ -31,8 +31,10 @@ import org.firstinspires.ftc.teamcode.Utilities.Vector;
 import org.firstinspires.ftc.teamcode.Systems.Software.SoftwareEnums.DriveMode;
 import org.firstinspires.ftc.vision.VisionPortal;
 import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
+import org.firstinspires.ftc.vision.tfod.TfodProcessor;
 
 import java.util.List;
+import java.util.Locale;
 
 public class Robot {
 
@@ -45,8 +47,15 @@ public class Robot {
     public Servo launcher;
     public CRServo dropper;
 
+    public final String modelName = "SilverStormTensorFlow.tflite";
+    public final String[] labels = {
+            "BlueTeamProp",
+            "RedTeamProp",
+    };
+
+    public TfodProcessor tensorFlow;
     public AprilTagProcessor tagProcessor;
-    public VisionPortal visionPortal;
+    public VisionPortal backVisionPortal;
 
     public double angleOffset;
 
@@ -178,6 +187,14 @@ public class Robot {
         launcher.setPosition(1);
         dropper.setPower(0);
 
+
+
+
+        tensorFlow = new TfodProcessor.Builder()
+                .setModelAssetName(modelName)
+                .setModelLabels(labels)
+                .build();
+
         tagProcessor = new AprilTagProcessor.Builder()
                 .setDrawAxes(true)
                 .setDrawCubeProjection(true)
@@ -185,8 +202,8 @@ public class Robot {
                 .setDrawTagOutline(true)
                 .build();
 
-        visionPortal = new VisionPortal.Builder()
-                .addProcessor(tagProcessor)
+        backVisionPortal = new VisionPortal.Builder()
+                .addProcessors(tagProcessor,tensorFlow)
                 .setCamera(opMode.hardwareMap.get(WebcamName.class,"Back_Camera"))
                 .setCameraResolution(new Size(640,480))
                 .build();
