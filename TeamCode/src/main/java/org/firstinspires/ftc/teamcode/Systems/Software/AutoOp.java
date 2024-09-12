@@ -33,6 +33,7 @@ public class AutoOp {
     }
 
     //sets up scoring and primary tags while spinning to the correct orientation before aligning
+
     private void firstOrient() {
 
         //find the primary tag id based on the scoring state and alliance

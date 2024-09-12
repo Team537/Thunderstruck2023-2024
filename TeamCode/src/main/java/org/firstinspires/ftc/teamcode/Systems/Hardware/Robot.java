@@ -17,6 +17,8 @@ import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.teamcode.Systems.Hardware.Subsystems.Arm;
 import org.firstinspires.ftc.teamcode.Systems.Hardware.Subsystems.Drivetrain;
 import org.firstinspires.ftc.teamcode.Systems.Software.AutoOp;
+import org.firstinspires.ftc.teamcode.Systems.Software.Burn;
+import org.firstinspires.ftc.teamcode.Systems.Software.ExternalFileWriter;
 import org.firstinspires.ftc.teamcode.Systems.Software.SoftwareEnums.Alliance;
 import org.firstinspires.ftc.teamcode.Systems.Software.SoftwareEnums.AutoScoringState;
 import org.firstinspires.ftc.teamcode.Systems.Software.SoftwareEnums.AutoStrategy;
@@ -35,6 +37,7 @@ import org.firstinspires.ftc.vision.tfod.TfodProcessor;
 
 import java.util.List;
 import java.util.Locale;
+import java.util.function.Supplier;
 
 public class Robot {
 
@@ -88,6 +91,12 @@ public class Robot {
     public Robot(LinearOpMode linearOpMode) {
         this.opMode = linearOpMode;
     }
+
+    Burn yawLogger = new Burn (
+        "TestYaw.txt",
+        () -> {return this.getBotHeading();},
+        this.runtime
+    );
 
     /**
      * sleeps for a number seconds using the robots internal clock
@@ -259,6 +268,10 @@ public class Robot {
      * updates the coordinates of the robot
      */
     public void update() {
+
+        yawLogger.log();
+        yawLogger.burn();
+
         lfPosition = drivetrain.lfMotor.getCurrentPosition();
         rfPosition = drivetrain.rfMotor.getCurrentPosition();
         rbPosition = drivetrain.rbMotor.getCurrentPosition();

@@ -33,11 +33,6 @@ public abstract class Auto extends LinearOpMode {
     ElapsedTime runtime = new ElapsedTime();
 
     /**
-     * sleeps for s seconds using the robots internal clock
-     * @param seconds time in seconds
-     */
-
-    /**
      * runs auto from manual parameters
      * @param alliance robot's alliance color
      * @param startPosition robot's starting position

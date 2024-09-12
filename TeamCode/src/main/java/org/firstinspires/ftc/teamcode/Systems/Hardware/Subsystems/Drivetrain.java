@@ -17,7 +17,7 @@ public class Drivetrain {
     private final double DEFAULT_STANDARD_DRIVE_SPEED = 1;
     private final double DEFAULT_PRECISE_DRIVE_SPEED = 0.3;
 
-    private final double DEFAULT_TURNING_RATIO = 0;
+    private final double DEFAULT_TURNING_RATIO = 0.5;
 
     public double standardDriveSpeed = DEFAULT_STANDARD_DRIVE_SPEED;
     public double preciseDriveSpeed = DEFAULT_PRECISE_DRIVE_SPEED;
